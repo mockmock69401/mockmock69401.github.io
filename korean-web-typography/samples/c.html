@@ -1,0 +1,1101 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>구름다리 항공권</title>
+<meta name="description" content="국내외 항공사 요금을 한 화면에서 비교하고 예약 수수료 없이 결제하는 항공권 검색 서비스, 구름다리">
+<meta name="theme-color" content="#0F6B5C">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@5/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="preload" as="image" href="https://picsum.photos/seed/gureumdari-hero-sky/1400/900" fetchpriority="high">
+<style>
+/*
+  Design read: 항공권 검색/예약 홈 (소비자 거래형), 신뢰 우선 + 담백한 프리미엄 톤.
+  Dials: DESIGN_VARIANCE 6 / MOTION_INTENSITY 4 / VISUAL_DENSITY 5
+  Aesthetic: native CSS, no design system package (single-file, no build step).
+
+  Shape rule (documented, applied everywhere):
+    - panels, images, bento cells: 20px  (--r-lg)
+    - inputs, buttons, list rows:  12px  (--r-md)
+    - chips, segmented control, icon-only round buttons: full pill (--r-pill)
+
+  Z-index scale: nav 30, combobox/popover 40, mobile menu 50.
+*/
+:root{
+  color-scheme: light;
+  --accent:#0F6B5C;
+  --accent-hover:#0B5649;
+  --accent-ink:#F3FAF8;
+  --accent-text:#0F6B5C;
+  --accent-soft:#E2F0EC;
+  --accent-soft-2:#CFE6DF;
+  --panel-bg:#0F6B5C;
+  --panel-ink:#F3FAF8;
+  --panel-muted:rgba(243,250,248,.78);
+  --panel-line:rgba(243,250,248,.18);
+
+  --bg:#F4F7F6;
+  --surface:#FCFDFC;
+  --surface-2:#EAEFED;
+  --line:#D7DFDC;
+  --field-border:#7E8D88;
+  --text:#101B18;
+  --text-2:#34433E;
+  --muted:#56655F;
+  --danger:#B42318;
+  --shadow-rgb:16 52 44;
+
+  --r-lg:20px; --r-md:12px; --r-pill:999px;
+  --wrap:1240px;
+  --gutter:24px;
+  --ease:cubic-bezier(.16,1,.3,1);
+
+  --font-sans:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --font-num:"Geist Variable","Pretendard Variable",Pretendard,system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --accent:#4DBFA8; --accent-hover:#6FD0BC; --accent-ink:#06231E; --accent-text:#6FD0BC;
+    --accent-soft:#12302A; --accent-soft-2:#1A3F37;
+    --panel-bg:#0E4A40; --panel-ink:#E8F5F1; --panel-muted:rgba(232,245,241,.76); --panel-line:rgba(232,245,241,.16);
+    --bg:#0B1210; --surface:#111A17; --surface-2:#18231F; --line:#25332F; --field-border:#5E716B;
+    --text:#E5EDEA; --text-2:#C3CFCB; --muted:#98A8A2; --danger:#F97066; --shadow-rgb:0 0 0;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --accent:#4DBFA8; --accent-hover:#6FD0BC; --accent-ink:#06231E; --accent-text:#6FD0BC;
+  --accent-soft:#12302A; --accent-soft-2:#1A3F37;
+  --panel-bg:#0E4A40; --panel-ink:#E8F5F1; --panel-muted:rgba(232,245,241,.76); --panel-line:rgba(232,245,241,.16);
+  --bg:#0B1210; --surface:#111A17; --surface-2:#18231F; --line:#25332F; --field-border:#5E716B;
+  --text:#E5EDEA; --text-2:#C3CFCB; --muted:#98A8A2; --danger:#F97066; --shadow-rgb:0 0 0;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:80px}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:var(--font-sans);font-size:1rem;line-height:1.65;
+  word-break:keep-all;overflow-wrap:break-word;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+h1,h2,h3,p{margin:0}
+ul{margin:0;padding:0;list-style:none}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.wrap{max-width:var(--wrap);margin-inline:auto;padding-inline:var(--gutter)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ph{line-height:1}
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  height:48px;padding:0 20px;border-radius:var(--r-md);border:1px solid transparent;
+  font-weight:650;font-size:1rem;white-space:nowrap;text-decoration:none;
+  transition:background-color .2s var(--ease),border-color .2s var(--ease),transform .15s var(--ease);
+}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-ghost{background:transparent;border-color:var(--line);color:var(--text)}
+.btn-ghost:hover{border-color:var(--field-border)}
+.icon-btn{
+  width:40px;height:40px;border-radius:var(--r-pill);border:1px solid var(--line);
+  background:var(--surface);display:inline-grid;place-items:center;font-size:1.15rem;color:var(--text-2);
+  transition:border-color .2s var(--ease),transform .15s var(--ease);
+}
+.icon-btn:hover{border-color:var(--field-border)}
+.icon-btn:active{transform:scale(.96)}
+
+/* ---------- Nav ---------- */
+.nav{
+  position:sticky;top:0;z-index:30;
+  background:color-mix(in srgb,var(--bg) 86%,transparent);
+  backdrop-filter:saturate(160%) blur(14px);-webkit-backdrop-filter:saturate(160%) blur(14px);
+  border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent);
+}
+.nav-inner{height:64px;display:flex;align-items:center;gap:40px}
+.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:750;font-size:1.1875rem;letter-spacing:-.03em}
+.brand-mark{width:30px;height:30px;flex:none}
+.nav-links{display:flex;gap:28px;font-size:.9375rem;font-weight:550;color:var(--text-2)}
+.nav-links a{text-decoration:none;padding:6px 0;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+.nav-actions .btn{height:40px;padding:0 16px;font-size:.9375rem}
+.menu-btn{display:none}
+.mobile-menu{display:none}
+
+/* ---------- Hero ---------- */
+.hero{padding-top:48px;padding-bottom:24px}
+.hero-grid{display:grid;grid-template-columns:5fr 7fr;gap:48px;align-items:center}
+.hero-copy{padding-bottom:72px}
+.hero h1{
+  font-size:clamp(2.25rem,1.45rem + 2.6vw,3.5rem);line-height:1.16;font-weight:760;letter-spacing:-.035em;
+  text-wrap:balance;
+}
+.hero-sub{margin-top:20px;font-size:1.125rem;line-height:1.65;color:var(--text-2);max-width:30em;text-wrap:pretty}
+.hero-media{margin:0;border-radius:var(--r-lg);overflow:hidden;aspect-ratio:1400/820;max-height:420px;background:var(--surface-2)}
+.hero-media img{width:100%;height:100%;object-fit:cover}
+
+/* ---------- Search ---------- */
+.search{
+  position:relative;z-index:2;margin-top:-76px;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:18px 24px 24px;
+  box-shadow:0 1px 0 rgb(var(--shadow-rgb) / .04),0 28px 56px -28px rgb(var(--shadow-rgb) / .34);
+}
+.search.flash{animation:flash 1.1s var(--ease)}
+@keyframes flash{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent),0 28px 56px -28px rgb(var(--shadow-rgb) / .34)}100%{box-shadow:0 0 0 14px transparent,0 28px 56px -28px rgb(var(--shadow-rgb) / .34)}}
+.search-top{display:flex;align-items:center;gap:20px;margin-bottom:16px;flex-wrap:wrap}
+.seg{display:inline-flex;padding:4px;background:var(--surface-2);border-radius:var(--r-pill);border:0;margin:0}
+.seg label{position:relative}
+.seg input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.seg span{display:block;padding:7px 18px;border-radius:var(--r-pill);font-size:.9375rem;font-weight:600;color:var(--muted);transition:background-color .2s var(--ease),color .2s}
+.seg input:checked + span{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgb(var(--shadow-rgb) / .14)}
+.seg input:focus-visible + span{outline:2px solid var(--accent);outline-offset:1px}
+.check{display:inline-flex;align-items:center;gap:8px;font-size:.9375rem;font-weight:550;color:var(--text-2);cursor:pointer}
+.check input{width:18px;height:18px;accent-color:var(--accent);margin:0}
+
+.fields{
+  display:grid;
+  grid-template-columns:minmax(0,2.35fr) minmax(0,1.12fr) minmax(0,1.12fr) minmax(0,1.3fr) auto;
+  gap:12px;align-items:start;
+}
+.search.is-oneway .fields{grid-template-columns:minmax(0,2.35fr) minmax(0,1.3fr) minmax(0,1.3fr) auto}
+.search.is-oneway .f-ret{display:none}
+.route{display:grid;grid-template-columns:minmax(0,1fr) 36px minmax(0,1fr);gap:6px;position:relative}
+.field{display:flex;flex-direction:column;gap:8px;min-width:0}
+.field > label,.field-label{font-size:.8125rem;font-weight:650;color:var(--text-2);line-height:1.4}
+.control{position:relative}
+.control > .ph{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.2rem;color:var(--muted);pointer-events:none}
+.input{
+  width:100%;height:52px;padding:0 14px 0 42px;
+  background:var(--surface);border:1px solid var(--field-border);border-radius:var(--r-md);
+  font-size:1rem;font-weight:600;color:var(--text);
+  transition:border-color .2s,box-shadow .2s;
+}
+.input::placeholder{color:var(--muted);font-weight:500}
+.input:hover{border-color:var(--text-2)}
+.input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.input[aria-invalid="true"]{border-color:var(--danger)}
+.input[type="date"]{padding:0 10px 0 14px;font-family:var(--font-num);font-variant-numeric:tabular-nums}
+.input:disabled{opacity:.5}
+.err{font-size:.8125rem;line-height:1.45;color:var(--danger);font-weight:550;min-height:0}
+.err:empty{display:none}
+.swap{
+  align-self:start;margin-top:36px;width:36px;height:36px;border-radius:var(--r-pill);
+  border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;color:var(--text-2);font-size:1.05rem;
+  transition:transform .35s var(--ease),border-color .2s;
+}
+.swap:hover{border-color:var(--field-border);color:var(--accent-text)}
+.swap.spin{transform:rotate(180deg)}
+.search-submit{height:52px;margin-top:29px;padding:0 24px}
+.search-submit[disabled]{opacity:.8;cursor:progress}
+
+/* combobox list */
+.listbox{
+  position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:40;min-width:280px;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:6px;
+  box-shadow:0 20px 40px -18px rgb(var(--shadow-rgb) / .38);max-height:320px;overflow:auto;
+}
+.listbox[hidden]{display:none}
+.opt{display:grid;grid-template-columns:48px 1fr;gap:10px;align-items:center;padding:9px 10px;border-radius:8px;cursor:pointer}
+.opt[aria-selected="true"],.opt:hover{background:var(--accent-soft)}
+.opt-code{font-family:var(--font-num);font-weight:650;font-size:.9375rem;color:var(--accent-text)}
+.opt-name{font-size:.9375rem;font-weight:600;line-height:1.35}
+.opt-sub{font-size:.8125rem;color:var(--muted);line-height:1.35}
+.opt-empty{padding:14px 12px;font-size:.875rem;color:var(--muted);line-height:1.55}
+
+/* passengers popover */
+.pax{position:relative}
+.pax-btn{text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.pax-pop{
+  position:absolute;right:0;top:calc(100% + 6px);z-index:40;width:340px;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;
+  box-shadow:0 24px 48px -20px rgb(var(--shadow-rgb) / .4);
+}
+.pax-pop[hidden]{display:none}
+.pax-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}
+.pax-row + .pax-row{border-top:1px solid var(--line)}
+.pax-name{font-weight:650;line-height:1.4}
+.pax-sub{font-size:.8125rem;color:var(--muted);line-height:1.4}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper button{width:34px;height:34px;border-radius:var(--r-pill);border:1px solid var(--field-border);background:var(--surface);display:grid;place-items:center;font-size:.95rem}
+.stepper button:disabled{opacity:.35;cursor:not-allowed}
+.stepper output{min-width:28px;text-align:center;font-family:var(--font-num);font-weight:650;font-size:1.0625rem}
+.cabin{margin:14px 0 0;padding:0;border:0}
+.cabin legend{font-weight:650;margin-bottom:10px;padding:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chip span,.chip-btn{
+  display:inline-block;padding:8px 14px;border-radius:var(--r-pill);border:1px solid var(--line);
+  font-size:.875rem;font-weight:600;color:var(--text-2);background:var(--surface);white-space:nowrap;
+  transition:background-color .2s var(--ease),border-color .2s,color .2s;
+}
+.chip input:checked + span,.chip-btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+.chip-btn:hover{border-color:var(--field-border)}
+.chip-btn[aria-pressed="true"]:hover{border-color:var(--accent)}
+.pax-help{margin-top:14px;font-size:.8125rem;color:var(--muted);line-height:1.5}
+.pax-help.warn{color:var(--danger)}
+.pax-done{width:100%;margin-top:16px;height:44px}
+
+/* results */
+.results{margin-top:20px;border-top:1px solid var(--line);padding-top:20px}
+.results[hidden]{display:none}
+.results-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px;margin-bottom:12px}
+.results-title{font-weight:700;font-size:1.0625rem}
+.results-note{font-size:.8125rem;color:var(--muted)}
+.res-row{
+  display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1.6fr) auto;gap:16px;align-items:center;
+  padding:14px 16px;border-radius:var(--r-md);background:var(--bg);
+}
+.res-row + .res-row{margin-top:8px}
+.res-air{font-weight:650}
+.res-air small{display:block;font-weight:500;color:var(--muted);font-size:.8125rem}
+.res-time{font-family:var(--font-num);font-weight:600;font-size:1.0625rem}
+.res-time small{display:block;font-family:var(--font-sans);font-weight:500;color:var(--muted);font-size:.8125rem}
+.res-price{text-align:right;font-family:var(--font-num);font-weight:700;font-size:1.125rem}
+.res-price small{display:block;font-family:var(--font-sans);font-weight:500;color:var(--muted);font-size:.75rem}
+.sk{border-radius:6px;background:linear-gradient(90deg,var(--surface-2) 0%,color-mix(in srgb,var(--surface-2) 40%,var(--surface)) 50%,var(--surface-2) 100%);background-size:200% 100%;animation:shimmer 1.2s linear infinite;height:14px}
+.sk + .sk{margin-top:8px}
+@keyframes shimmer{to{background-position:-200% 0}}
+
+/* ---------- Airlines strip ---------- */
+.airlines{padding:56px 0 8px}
+.airlines-label{font-size:.9375rem;color:var(--muted);font-weight:550}
+.logos{margin-top:22px;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:28px 24px;align-items:center}
+/* Mid-gray (#6B7A75) logos read at >=4:1 on both the light and dark page backgrounds */
+.logo{display:block;width:100%;height:30px;object-fit:contain;opacity:.9}
+
+/* ---------- Sections ---------- */
+.section{padding:96px 0}
+.h2{font-size:clamp(1.625rem,1.2rem + 1.3vw,2.25rem);line-height:1.28;font-weight:740;letter-spacing:-.03em;text-wrap:balance}
+.lede{margin-top:12px;color:var(--text-2);max-width:40em;font-size:1.0625rem}
+
+/* deals */
+.deals-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px}
+.deals-tools{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.deals-nav{display:flex;gap:8px}
+.deal-track{
+  margin-top:32px;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(260px,288px);gap:20px;
+  overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gutter);
+  margin-inline:calc(var(--gutter) * -1);padding:4px var(--gutter) 16px;
+  scrollbar-width:thin;scrollbar-color:var(--line) transparent;
+  transition:opacity .25s var(--ease);
+}
+.deal-track.fading{opacity:0}
+.deal{scroll-snap-align:start}
+.deal-hit{
+  display:block;width:100%;padding:0;border:0;background:none;text-align:left;border-radius:var(--r-lg);
+}
+.deal-img{border-radius:var(--r-lg);overflow:hidden;aspect-ratio:4/3;background:var(--surface-2)}
+.deal-img img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease)}
+.deal-hit:hover .deal-img img{transform:scale(1.04)}
+.deal-body{padding:14px 2px 0}
+.deal-city{font-size:1.25rem;font-weight:720;letter-spacing:-.02em;line-height:1.3}
+.deal-meta{margin-top:2px;font-size:.875rem;color:var(--muted);line-height:1.5}
+.deal-foot{margin-top:12px;display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.deal-price{font-family:var(--font-num);font-weight:700;font-size:1.25rem;letter-spacing:-.02em}
+.deal-price span{font-family:var(--font-sans);font-size:.875rem;font-weight:600;margin-left:1px}
+.deal-go{font-size:.875rem;font-weight:650;color:var(--accent-text);display:inline-flex;align-items:center;gap:4px}
+.deal-hit:hover .deal-go .ph{transform:translateX(3px)}
+.deal-go .ph{transition:transform .25s var(--ease)}
+.deals-empty{padding:40px 0;color:var(--muted)}
+.deals-fine{margin-top:8px;font-size:.8125rem;color:var(--muted)}
+
+/* bento */
+.bento{margin-top:40px;display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:16px}
+.cell{border-radius:var(--r-lg);padding:28px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.cell h3{font-size:1.25rem;font-weight:720;letter-spacing:-.02em;line-height:1.35}
+.cell p{color:var(--text-2);font-size:.9375rem;line-height:1.65}
+.cell-icon{width:44px;height:44px;border-radius:var(--r-md);display:grid;place-items:center;font-size:1.4rem;margin-bottom:8px}
+.b-alert{grid-row:1 / span 2;background:var(--panel-bg);color:var(--panel-ink);padding:32px}
+.b-alert p{color:var(--panel-muted)}
+.b-alert .cell-icon{background:var(--panel-line);color:var(--panel-ink)}
+.alert-list{margin-top:auto;padding-top:24px;display:grid;gap:8px}
+.alert-row{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:14px 16px;border-radius:var(--r-md);background:color-mix(in srgb,var(--panel-ink) 9%,transparent)}
+.alert-route{font-family:var(--font-num);font-weight:650;font-size:.9375rem}
+.alert-route small{font-family:var(--font-sans);font-weight:500;color:var(--panel-muted);margin-left:6px;font-size:.8125rem}
+.alert-price{font-family:var(--font-num);font-weight:700;text-align:right}
+.alert-drop{grid-column:1 / -1;font-size:.8125rem;color:var(--panel-muted)}
+.b-bag{grid-column:2 / span 2;background:var(--surface);border:1px solid var(--line);padding:0;display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+.b-bag img{width:100%;height:100%;object-fit:cover;min-height:240px}
+.b-bag .bag-copy{padding:28px;display:flex;flex-direction:column;gap:10px;justify-content:center}
+.b-bag .cell-icon,.b-support .cell-icon{background:var(--accent-soft);color:var(--accent-text)}
+.b-cancel{background:var(--accent-soft)}
+.b-cancel .cell-icon{background:var(--surface);color:var(--accent-text)}
+.b-support{background:var(--surface-2)}
+.phone{margin-top:auto;padding-top:8px;font-family:var(--font-num);font-weight:700;font-size:1.5rem;letter-spacing:-.02em;color:var(--text)}
+
+/* testimonials */
+.voices{margin-top:40px;display:grid;grid-template-columns:7fr 5fr;gap:56px;align-items:start}
+.q-main blockquote{margin:0;font-size:clamp(1.25rem,1rem + .9vw,1.625rem);line-height:1.6;font-weight:600;letter-spacing:-.02em;text-wrap:pretty}
+.q-side{display:grid}
+.q-side figure + figure{border-top:1px solid var(--line);padding-top:24px;margin-top:24px}
+.q-side blockquote{margin:0;font-size:1.0625rem;line-height:1.7;color:var(--text)}
+figure{margin:0}
+figcaption{margin-top:16px;font-size:.875rem;color:var(--muted);line-height:1.5}
+figcaption strong{color:var(--text);font-weight:650;margin-right:8px}
+.q-route{display:block;margin-top:2px;font-family:var(--font-num)}
+
+/* faq */
+.faq-grid{display:grid;grid-template-columns:4fr 8fr;gap:56px;align-items:start}
+.faq-aside p{margin-top:12px;color:var(--text-2)}
+.faq-aside .phone{display:block;margin-top:20px}
+.faq-list details{border-bottom:1px solid var(--line)}
+.faq-list details:first-child{border-top:1px solid var(--line)}
+.faq-list summary{
+  list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:22px 4px;font-weight:650;font-size:1.0625rem;line-height:1.5;
+}
+.faq-list summary::-webkit-details-marker{display:none}
+.faq-list summary .ph{flex:none;font-size:1.1rem;color:var(--muted);transition:transform .3s var(--ease)}
+.faq-list details[open] summary .ph{transform:rotate(45deg);color:var(--accent-text)}
+.faq-list .ans{padding:0 4px 24px;color:var(--text-2);max-width:60ch}
+
+/* footer */
+.footer{border-top:1px solid var(--line);padding:64px 0 40px;background:var(--surface)}
+.foot-top{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:40px}
+.foot-brand p{margin-top:12px;color:var(--muted);font-size:.9375rem;max-width:22em}
+.foot-col h3{font-size:.875rem;font-weight:700;margin-bottom:14px}
+.foot-col ul{display:grid;gap:10px}
+.foot-col a{text-decoration:none;color:var(--muted);font-size:.9375rem}
+.foot-col a:hover{color:var(--text)}
+.foot-col a.strong{font-weight:700;color:var(--text-2)}
+.foot-legal{margin-top:48px;padding-top:24px;border-top:1px solid var(--line);font-size:.8125rem;color:var(--muted);line-height:1.8}
+.foot-legal p + p{margin-top:6px}
+.foot-legal .sep{margin:0 8px;color:var(--line)}
+
+/* ---------- Motion (MOTION_INTENSITY 4, all gated) ---------- */
+@media (prefers-reduced-motion: no-preference){
+  .logo.reveal.is-in{opacity:.9}
+  .enter{opacity:0;transform:translateY(14px);animation:enter .8s var(--ease) forwards;animation-delay:calc(var(--i,0) * 90ms)}
+  @keyframes enter{to{opacity:1;transform:none}}
+  .reveal{opacity:0;transform:translateY(20px);transition:opacity .7s var(--ease),transform .7s var(--ease);transition-delay:calc(var(--i,0) * 70ms)}
+  .reveal.is-in{opacity:1;transform:none}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
+  .sk{animation:none}
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1099px){
+  .fields,.search.is-oneway .fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .route{grid-column:1 / -1}
+  .f-pax{grid-column:1 / 2}
+  .search-submit{margin-top:29px}
+  .search.is-oneway .f-dep{grid-column:1 / -1}
+  .logos{grid-template-columns:repeat(4,minmax(0,1fr));gap:28px 40px}
+}
+@media (max-width:1023px){
+  .nav-links{display:none}
+  .nav-actions .login{display:none}
+  .menu-btn{display:inline-grid}
+  .mobile-menu{display:block;position:absolute;left:0;right:0;top:64px;z-index:50;background:var(--surface);border-bottom:1px solid var(--line);box-shadow:0 20px 40px -24px rgb(var(--shadow-rgb) / .35)}
+  .mobile-menu[hidden]{display:none}
+  .mobile-menu ul{padding:8px var(--gutter) 20px;display:grid}
+  .mobile-menu a:not(.btn){display:block;padding:14px 0;text-decoration:none;font-weight:600;font-size:1.0625rem;border-bottom:1px solid var(--line)}
+  .mobile-menu .btn{margin-top:16px;width:100%}
+  .hero-grid{grid-template-columns:1fr;gap:28px}
+  .hero-copy{padding-bottom:0}
+  .hero-media{max-height:none;aspect-ratio:16/9}
+  .bento{grid-template-columns:1fr 1fr}
+  .b-alert{grid-column:1 / -1;grid-row:auto}
+  .b-bag{grid-column:1 / -1}
+  .voices,.faq-grid{grid-template-columns:1fr;gap:40px}
+  .foot-top{grid-template-columns:1fr 1fr 1fr}
+  .foot-brand{grid-column:1 / -1}
+}
+@media (max-width:767px){
+  :root{--gutter:16px}
+  .hero{padding-top:28px}
+  .hero-sub{font-size:1.0625rem;margin-top:14px}
+  .hero-media{aspect-ratio:16/10}
+  .search{margin-top:-40px;padding:16px}
+  .search-top{gap:14px;margin-bottom:14px}
+  .route{grid-template-columns:1fr;gap:12px}
+  .swap{position:absolute;right:14px;top:50%;margin-top:4px;transform:translateY(-50%) rotate(90deg);z-index:3;background:var(--surface)}
+  .swap.spin{transform:translateY(-50%) rotate(270deg)}
+  .route .f-from .input,.route .f-to .input{padding-right:56px}
+  .f-pax{grid-column:1 / -1}
+  .search-submit{grid-column:1 / -1;margin-top:4px;width:100%}
+  .pax-pop{left:0;right:0;width:auto}
+  .res-row{grid-template-columns:1fr auto;gap:6px 12px}
+  .res-time{grid-column:1 / 2;grid-row:2}
+  .res-price{grid-row:1 / span 2;grid-column:2}
+  .airlines{padding-top:40px}
+  .logos{gap:24px 28px}
+  .logo{height:24px}
+  .section{padding:64px 0}
+  .deals-tools{width:100%}
+  .deals-nav{display:none}
+  .chips-scroll{display:flex;flex-wrap:nowrap;overflow-x:auto;margin-inline:calc(var(--gutter) * -1);padding:2px var(--gutter);scrollbar-width:none}
+  .chips-scroll::-webkit-scrollbar{display:none}
+  .deal-track{grid-auto-columns:78%;gap:14px}
+  .bento{grid-template-columns:1fr}
+  .b-bag{grid-template-columns:1fr}
+  .b-bag img{min-height:0;aspect-ratio:16/9}
+  .cell,.b-alert{padding:24px}
+  .cell.b-bag{padding:0}
+  .b-bag .bag-copy{padding:24px}
+  .foot-top{grid-template-columns:1fr 1fr;gap:32px 24px}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#" aria-label="구름다리 홈">
+      <!-- Simple geometric mark: an arch (bridge) over a baseline -->
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect width="32" height="32" rx="9" fill="var(--accent)"/>
+        <path d="M7 21.5a9 9 0 0 1 18 0" fill="none" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M6.5 24.5h19" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round"/>
+      </svg>
+      구름다리
+    </a>
+    <nav class="nav-links" aria-label="주요 메뉴">
+      <a href="#search">항공권</a>
+      <a href="#deals">특가 항공권</a>
+      <a href="#">예약 조회</a>
+      <a href="#faq">고객센터</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="화면 테마 바꾸기"><i class="ph ph-moon" aria-hidden="true"></i></button>
+      <a class="btn btn-ghost login" href="#">로그인</a>
+      <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="mobileMenu"><i class="ph ph-list" aria-hidden="true"></i></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu" hidden>
+    <ul>
+      <li><a href="#search">항공권</a></li>
+      <li><a href="#deals">특가 항공권</a></li>
+      <li><a href="#">예약 조회</a></li>
+      <li><a href="#faq">고객센터</a></li>
+      <li><a class="btn btn-ghost" href="#">로그인</a></li>
+    </ul>
+  </div>
+</header>
+
+<main>
+  <!-- ============ Hero + search ============ -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <h1 id="hero-title" class="enter" style="--i:0">어디로 떠날지만 정하세요</h1>
+        <p class="hero-sub enter" style="--i:1">국내외 항공사 요금을 한 화면에서 비교하고, 예약 수수료 없이 바로 결제하세요.</p>
+      </div>
+      <figure class="hero-media enter" style="--i:1">
+        <img src="https://picsum.photos/seed/gureumdari-hero-sky/1400/900" width="1400" height="900" alt="" fetchpriority="high">
+      </figure>
+    </div>
+
+    <div class="wrap">
+      <form class="search enter" style="--i:2" id="search" novalidate aria-label="항공권 검색">
+        <div class="search-top">
+          <fieldset class="seg">
+            <legend class="sr-only">여정 유형</legend>
+            <label><input type="radio" name="trip" value="round" checked><span>왕복</span></label>
+            <label><input type="radio" name="trip" value="oneway"><span>편도</span></label>
+          </fieldset>
+          <label class="check"><input type="checkbox" id="direct"> 직항만 보기</label>
+        </div>
+
+        <div class="fields">
+          <div class="route">
+            <div class="field f-from">
+              <label for="from">출발지</label>
+              <div class="control combo">
+                <i class="ph ph-airplane-takeoff" aria-hidden="true"></i>
+                <input class="input" id="from" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="from-list" aria-describedby="from-err" autocomplete="off" placeholder="도시 또는 공항" value="서울/인천 (ICN)" data-code="ICN">
+                <ul class="listbox" id="from-list" role="listbox" aria-label="출발 공항" hidden></ul>
+              </div>
+              <p class="err" id="from-err" aria-live="polite"></p>
+            </div>
+            <button class="swap" id="swapBtn" type="button" aria-label="출발지와 도착지 바꾸기"><i class="ph ph-arrows-left-right" aria-hidden="true"></i></button>
+            <div class="field f-to">
+              <label for="to">도착지</label>
+              <div class="control combo">
+                <i class="ph ph-airplane-landing" aria-hidden="true"></i>
+                <input class="input" id="to" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="to-list" aria-describedby="to-err" autocomplete="off" placeholder="도시 또는 공항">
+                <ul class="listbox" id="to-list" role="listbox" aria-label="도착 공항" hidden></ul>
+              </div>
+              <p class="err" id="to-err" aria-live="polite"></p>
+            </div>
+          </div>
+
+          <div class="field f-dep">
+            <label for="dep">가는 날</label>
+            <div class="control">
+              <input class="input" id="dep" type="date" aria-describedby="dep-err">
+            </div>
+            <p class="err" id="dep-err" aria-live="polite"></p>
+          </div>
+          <div class="field f-ret">
+            <label for="ret">오는 날</label>
+            <div class="control">
+              <input class="input" id="ret" type="date" aria-describedby="ret-err">
+            </div>
+            <p class="err" id="ret-err" aria-live="polite"></p>
+          </div>
+
+          <div class="field f-pax pax">
+            <span class="field-label" id="pax-label">승객 및 좌석</span>
+            <div class="control">
+              <i class="ph ph-user" aria-hidden="true"></i>
+              <button class="input pax-btn" id="paxBtn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="paxPop" aria-labelledby="pax-label paxBtn">성인 1명, 일반석</button>
+            </div>
+            <div class="pax-pop" id="paxPop" role="dialog" aria-label="승객 및 좌석 선택" hidden>
+              <div class="pax-row">
+                <div><p class="pax-name">성인</p><p class="pax-sub">만 12세 이상</p></div>
+                <div class="stepper">
+                  <button type="button" data-k="adult" data-d="-1" aria-label="성인 한 명 줄이기"><i class="ph ph-minus" aria-hidden="true"></i></button>
+                  <output id="n-adult" aria-live="polite">1</output>
+                  <button type="button" data-k="adult" data-d="1" aria-label="성인 한 명 늘리기"><i class="ph ph-plus" aria-hidden="true"></i></button>
+                </div>
+              </div>
+              <div class="pax-row">
+                <div><p class="pax-name">소아</p><p class="pax-sub">만 2세 이상 12세 미만</p></div>
+                <div class="stepper">
+                  <button type="button" data-k="child" data-d="-1" aria-label="소아 한 명 줄이기"><i class="ph ph-minus" aria-hidden="true"></i></button>
+                  <output id="n-child" aria-live="polite">0</output>
+                  <button type="button" data-k="child" data-d="1" aria-label="소아 한 명 늘리기"><i class="ph ph-plus" aria-hidden="true"></i></button>
+                </div>
+              </div>
+              <div class="pax-row">
+                <div><p class="pax-name">유아</p><p class="pax-sub">만 2세 미만, 좌석 없음</p></div>
+                <div class="stepper">
+                  <button type="button" data-k="infant" data-d="-1" aria-label="유아 한 명 줄이기"><i class="ph ph-minus" aria-hidden="true"></i></button>
+                  <output id="n-infant" aria-live="polite">0</output>
+                  <button type="button" data-k="infant" data-d="1" aria-label="유아 한 명 늘리기"><i class="ph ph-plus" aria-hidden="true"></i></button>
+                </div>
+              </div>
+              <fieldset class="cabin">
+                <legend>좌석 등급</legend>
+                <div class="chips">
+                  <label class="chip"><input type="radio" name="cabin" value="일반석" checked><span>일반석</span></label>
+                  <label class="chip"><input type="radio" name="cabin" value="프리미엄 일반석"><span>프리미엄 일반석</span></label>
+                  <label class="chip"><input type="radio" name="cabin" value="비즈니스"><span>비즈니스</span></label>
+                  <label class="chip"><input type="radio" name="cabin" value="일등석"><span>일등석</span></label>
+                </div>
+              </fieldset>
+              <p class="pax-help" id="paxHelp">한 번에 최대 9명까지 예약할 수 있고, 유아는 성인 1명당 1명까지 함께할 수 있어요.</p>
+              <button class="btn btn-primary pax-done" id="paxDone" type="button">적용</button>
+            </div>
+          </div>
+
+          <button class="btn btn-primary search-submit" id="submitBtn" type="submit">
+            <i class="ph ph-magnifying-glass" aria-hidden="true"></i><span>항공권 검색</span>
+          </button>
+        </div>
+
+        <div class="results" id="results" hidden aria-live="polite"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ Airline logos (logo only) ============ -->
+  <section class="airlines" aria-labelledby="air-label">
+    <div class="wrap">
+      <p class="airlines-label" id="air-label">구름다리에서 요금을 비교할 수 있는 항공사 일부</p>
+      <div class="logos">
+        <img class="logo reveal" src="https://cdn.simpleicons.org/japanairlines/6B7A75" alt="Japan Airlines" width="120" height="30" loading="lazy" style="--i:0">
+        <img class="logo reveal" src="https://cdn.simpleicons.org/ana/6B7A75" alt="ANA" width="120" height="30" loading="lazy" style="--i:1">
+        <img class="logo reveal" src="https://cdn.simpleicons.org/singaporeairlines/6B7A75" alt="Singapore Airlines" width="120" height="30" loading="lazy" style="--i:2">
+        <img class="logo reveal" src="https://cdn.simpleicons.org/emirates/6B7A75" alt="Emirates" width="120" height="30" loading="lazy" style="--i:3">
+        <img class="logo reveal" src="https://cdn.simpleicons.org/qatarairways/6B7A75" alt="Qatar Airways" width="120" height="30" loading="lazy" style="--i:4">
+        <img class="logo reveal" src="https://cdn.simpleicons.org/lufthansa/6B7A75" alt="Lufthansa" width="120" height="30" loading="lazy" style="--i:5">
+        <img class="logo reveal" src="https://cdn.simpleicons.org/turkishairlines/6B7A75" alt="Turkish Airlines" width="120" height="30" loading="lazy" style="--i:6">
+        <img class="logo reveal" src="https://cdn.simpleicons.org/klm/6B7A75" alt="KLM" width="120" height="30" loading="lazy" style="--i:7">
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Deals (horizontal scroll-snap) ============ -->
+  <section class="section" id="deals" aria-labelledby="deals-title">
+    <div class="wrap">
+      <div class="deals-head">
+        <div>
+          <h2 class="h2" id="deals-title">이번 주 특가 노선</h2>
+          <p class="lede">카드를 누르면 검색 조건이 바로 채워져요.</p>
+        </div>
+        <div class="deals-tools">
+          <div class="chips chips-scroll" role="group" aria-label="지역 필터">
+            <button class="chip-btn" type="button" data-region="all" aria-pressed="true">전체</button>
+            <button class="chip-btn" type="button" data-region="japan" aria-pressed="false">일본</button>
+            <button class="chip-btn" type="button" data-region="sea" aria-pressed="false">동남아시아</button>
+            <button class="chip-btn" type="button" data-region="domestic" aria-pressed="false">국내</button>
+            <button class="chip-btn" type="button" data-region="long" aria-pressed="false">장거리</button>
+          </div>
+          <div class="deals-nav">
+            <button class="icon-btn" id="dealPrev" type="button" aria-label="이전 특가 보기"><i class="ph ph-caret-left" aria-hidden="true"></i></button>
+            <button class="icon-btn" id="dealNext" type="button" aria-label="다음 특가 보기"><i class="ph ph-caret-right" aria-hidden="true"></i></button>
+          </div>
+        </div>
+      </div>
+      <div class="deal-track" id="dealTrack"></div>
+      <p class="deals-fine">성인 1명 왕복 기준, 유류할증료와 세금을 포함한 금액이에요. 좌석 상황에 따라 바뀔 수 있어요.</p>
+    </div>
+  </section>
+
+  <!-- ============ Benefits bento (4 items, 4 cells) ============ -->
+  <section class="section" style="padding-top:0" aria-labelledby="why-title">
+    <div class="wrap">
+      <h2 class="h2 reveal" id="why-title">예약할 때도, 떠난 뒤에도 곁에 있어요</h2>
+      <div class="bento">
+        <article class="cell b-alert reveal">
+          <div class="cell-icon"><i class="ph ph-bell-ringing" aria-hidden="true"></i></div>
+          <h3>가격이 내려가면 바로 알려드려요</h3>
+          <p>관심 노선을 저장해 두면 최저가가 바뀔 때 앱 알림을 보내드려요.</p>
+          <!-- mock alert data -->
+          <ul class="alert-list" aria-label="가격 알림 예시">
+            <li class="alert-row">
+              <span class="alert-route">ICN → FUK<small>후쿠오카</small></span>
+              <span class="alert-price">142,700원</span>
+              <span class="alert-drop">어제보다 18,300원 내렸어요</span>
+            </li>
+            <li class="alert-row">
+              <span class="alert-route">ICN → DAD<small>다낭</small></span>
+              <span class="alert-price">276,400원</span>
+              <span class="alert-drop">지난주보다 41,900원 내렸어요</span>
+            </li>
+            <li class="alert-row">
+              <span class="alert-route">GMP → CJU<small>제주</small></span>
+              <span class="alert-price">48,900원</span>
+              <span class="alert-drop">이번 달 최저가예요</span>
+            </li>
+          </ul>
+        </article>
+
+        <article class="cell b-bag reveal" style="--i:1">
+          <img src="https://picsum.photos/seed/gureumdari-luggage-airport/900/700" width="900" height="700" alt="" loading="lazy">
+          <div class="bag-copy">
+            <div class="cell-icon"><i class="ph ph-suitcase-rolling" aria-hidden="true"></i></div>
+            <h3>수하물 포함 금액으로 비교해요</h3>
+            <p>위탁 수하물까지 더한 실제 결제 금액 순으로 보여드려서, 공항에서 추가 요금에 놀랄 일이 없어요.</p>
+          </div>
+        </article>
+
+        <article class="cell b-cancel reveal" style="--i:2">
+          <div class="cell-icon"><i class="ph ph-arrow-counter-clockwise" aria-hidden="true"></i></div>
+          <h3>결제 후 24시간 무료 취소</h3>
+          <p>대부분의 항공권은 결제하고 24시간 안에 수수료 없이 취소할 수 있어요.</p>
+        </article>
+
+        <article class="cell b-support reveal" style="--i:3">
+          <div class="cell-icon"><i class="ph ph-headset" aria-hidden="true"></i></div>
+          <h3>출발 당일에도 상담 연결</h3>
+          <p>결항이나 지연이 생기면 전화와 채팅으로 대체 항공편을 함께 찾아드려요.</p>
+          <p class="phone">1670-2408</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Testimonials ============ -->
+  <section class="section" style="padding-top:0" aria-labelledby="voice-title">
+    <div class="wrap">
+      <h2 class="h2 reveal" id="voice-title">이용하신 분들의 후기</h2>
+      <div class="voices">
+        <figure class="q-main reveal">
+          <blockquote>“출발 이틀 전에 가격 알림이 와서 다낭 왕복을 9만 원 가까이 싸게 샀어요. 수하물 포함 금액이라 공항에서 추가로 낸 돈도 없었고요.”</blockquote>
+          <figcaption><strong>윤서진</strong>회사원<span class="q-route">인천 → 다낭 이용</span></figcaption>
+        </figure>
+        <div class="q-side">
+          <figure class="reveal" style="--i:1">
+            <blockquote>“결항 문자를 받고 채팅으로 문의했더니 20분 만에 다음 날 첫 비행기로 바꿔 주셨어요.”</blockquote>
+            <figcaption><strong>한지훈</strong>프리랜서 디자이너<span class="q-route">김포 → 제주 이용</span></figcaption>
+          </figure>
+          <figure class="reveal" style="--i:2">
+            <blockquote>“아이 둘과 가는 여행이라 좌석 등급이랑 유아 요금을 한 번에 비교할 수 있어서 편했어요.”</blockquote>
+            <figcaption><strong>문가은</strong>초등학교 교사<span class="q-route">인천 → 후쿠오카 이용</span></figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="section" id="faq" style="padding-top:0" aria-labelledby="faq-title">
+    <div class="wrap faq-grid">
+      <div class="faq-aside reveal">
+        <h2 class="h2" id="faq-title">자주 묻는 질문</h2>
+        <p>찾는 답이 없다면 24시간 상담으로 편하게 물어보세요.</p>
+        <span class="phone">1670-2408</span>
+      </div>
+      <div class="faq-list reveal" style="--i:1">
+        <details>
+          <summary>예약 수수료가 정말 없나요?<i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <p class="ans">구름다리는 항공권 예약 수수료를 받지 않아요. 화면에 보이는 금액에 유류할증료와 세금이 모두 포함되어 있어요.</p>
+        </details>
+        <details>
+          <summary>항공권 취소와 환불은 어떻게 하나요?<i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <p class="ans">예약 조회에서 취소를 신청하면 돼요. 환불 수수료는 항공사 규정에 따라 다르고, 결제 후 24시간 안이라면 대부분 무료로 취소할 수 있어요.</p>
+        </details>
+        <details>
+          <summary>발권이 끝났는지 어떻게 확인하나요?<i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <p class="ans">결제 후 보통 30분 안에 이메일과 카카오톡으로 전자항공권(e티켓)을 보내드려요. 예약 조회에서도 바로 확인할 수 있어요.</p>
+        </details>
+        <details>
+          <summary>여권 영문 이름을 잘못 입력했어요.<i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <p class="ans">발권 전이라면 예약 조회에서 직접 고칠 수 있어요. 발권 후에는 항공사에 따라 수정 수수료가 생길 수 있으니 상담으로 문의해 주세요.</p>
+        </details>
+        <details>
+          <summary>마일리지를 적립할 수 있나요?<i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <p class="ans">대부분의 항공사에서 적립할 수 있어요. 예약할 때 회원 번호를 입력하거나, 탑승 후 항공사 홈페이지에서 사후 적립을 신청하세요.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a class="brand" href="#" aria-label="구름다리 홈">
+          <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+            <rect width="32" height="32" rx="9" fill="var(--accent)"/>
+            <path d="M7 21.5a9 9 0 0 1 18 0" fill="none" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round"/>
+            <path d="M6.5 24.5h19" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round"/>
+          </svg>
+          구름다리
+        </a>
+        <p>국내외 항공권을 비교하고 수수료 없이 예약하는 항공권 검색 서비스</p>
+      </div>
+      <div class="foot-col">
+        <h3>서비스</h3>
+        <ul>
+          <li><a href="#search">항공권 검색</a></li>
+          <li><a href="#deals">특가 항공권</a></li>
+          <li><a href="#">가격 알림</a></li>
+          <li><a href="#">예약 조회</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h3>고객지원</h3>
+        <ul>
+          <li><a href="#faq">자주 묻는 질문</a></li>
+          <li><a href="#">1:1 문의</a></li>
+          <li><a href="#">취소 및 환불 규정</a></li>
+          <li><a href="#">공지사항</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h3>회사</h3>
+        <ul>
+          <li><a href="#">회사 소개</a></li>
+          <li><a href="#">이용약관</a></li>
+          <li><a class="strong" href="#">개인정보처리방침</a></li>
+          <li><a href="#">채용</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <p>(주)구름다리<span class="sep">|</span>대표이사 서하람<span class="sep">|</span>사업자등록번호 214-87-40326<span class="sep">|</span>통신판매업신고 제2024-서울강남-03172호</p>
+      <p>서울특별시 강남구 테헤란로 427, 9층<span class="sep">|</span>고객센터 1670-2408 (24시간)</p>
+      <p>구름다리는 통신판매중개자로서 항공권 거래의 당사자가 아니며, 항공 운송과 환불에 대한 책임은 각 항공사에 있습니다.</p>
+      <p>© 2026 Gureumdari Inc.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const won = n => new Intl.NumberFormat('ko-KR').format(n);
+
+  /* ---------- Theme (system default + manual override) ---------- */
+  const root = document.documentElement;
+  const themeBtn = $('#themeBtn');
+  const sysDark = matchMedia('(prefers-color-scheme: dark)');
+  try { const t = localStorage.getItem('gd-theme'); if (t === 'light' || t === 'dark') root.dataset.theme = t; } catch (e) {}
+  const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark' : sysDark.matches;
+  const syncThemeIcon = () => {
+    themeBtn.innerHTML = `<i class="ph ${isDark() ? 'ph-sun' : 'ph-moon'}" aria-hidden="true"></i>`;
+    themeBtn.setAttribute('aria-label', isDark() ? '밝은 화면으로 바꾸기' : '어두운 화면으로 바꾸기');
+  };
+  themeBtn.addEventListener('click', () => {
+    const next = isDark() ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try { localStorage.setItem('gd-theme', next); } catch (e) {}
+    syncThemeIcon();
+  });
+  sysDark.addEventListener('change', syncThemeIcon);
+  syncThemeIcon();
+
+  /* ---------- Mobile menu ---------- */
+  const menuBtn = $('#menuBtn'), menu = $('#mobileMenu');
+  const setMenu = open => {
+    menu.hidden = !open;
+    menuBtn.setAttribute('aria-expanded', String(open));
+    menuBtn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
+    menuBtn.innerHTML = `<i class="ph ${open ? 'ph-x' : 'ph-list'}" aria-hidden="true"></i>`;
+  };
+  menuBtn.addEventListener('click', () => setMenu(menu.hidden));
+  $$('a', menu).forEach(a => a.addEventListener('click', () => setMenu(false)));
+
+  /* ---------- Airports ---------- */
+  const AIRPORTS = [
+    ['ICN','서울/인천','인천국제공항','대한민국'], ['GMP','서울/김포','김포국제공항','대한민국'],
+    ['PUS','부산/김해','김해국제공항','대한민국'], ['CJU','제주','제주국제공항','대한민국'],
+    ['TAE','대구','대구국제공항','대한민국'],
+    ['KIX','오사카/간사이','간사이국제공항','일본'], ['NRT','도쿄/나리타','나리타국제공항','일본'],
+    ['HND','도쿄/하네다','하네다공항','일본'], ['FUK','후쿠오카','후쿠오카공항','일본'],
+    ['CTS','삿포로','신치토세공항','일본'], ['OKA','오키나와','나하공항','일본'],
+    ['TPE','타이베이','타오위안국제공항','대만'], ['HKG','홍콩','홍콩국제공항','홍콩'],
+    ['DAD','다낭','다낭국제공항','베트남'], ['SGN','호찌민','떤선녓국제공항','베트남'],
+    ['BKK','방콕','수완나품국제공항','태국'], ['CEB','세부','막탄세부국제공항','필리핀'],
+    ['SIN','싱가포르','창이국제공항','싱가포르'], ['CDG','파리','샤를드골국제공항','프랑스'],
+    ['LHR','런던','히드로공항','영국'], ['JFK','뉴욕','존 F. 케네디국제공항','미국'],
+    ['LAX','로스앤젤레스','로스앤젤레스국제공항','미국'], ['SYD','시드니','시드니국제공항','호주']
+  ].map(([code, label, name, country]) => ({ code, label, name, country }));
+  const byCode = c => AIRPORTS.find(a => a.code === c);
+  const display = a => `${a.label} (${a.code})`;
+
+  function setupCombo(input) {
+    const list = document.getElementById(input.getAttribute('aria-controls'));
+    let items = [], active = -1;
+    const close = () => { list.hidden = true; input.setAttribute('aria-expanded', 'false'); input.removeAttribute('aria-activedescendant'); active = -1; };
+    const render = q => {
+      const s = q.trim().toLowerCase();
+      items = s ? AIRPORTS.filter(a => [a.code, a.label, a.name, a.country].some(v => v.toLowerCase().includes(s))).slice(0, 7) : AIRPORTS.slice(0, 7);
+      active = -1;
+      list.innerHTML = items.length
+        ? items.map((a, i) => `<li class="opt" role="option" id="${list.id}-${i}" aria-selected="false" data-i="${i}"><span class="opt-code">${a.code}</span><span><span class="opt-name">${a.label}</span><br><span class="opt-sub">${a.name}, ${a.country}</span></span></li>`).join('')
+        : `<li class="opt-empty" role="option" aria-disabled="true">일치하는 공항이 없어요. 도시 이름이나 공항 코드(예: KIX)로 찾아보세요.</li>`;
+      list.hidden = false; input.setAttribute('aria-expanded', 'true');
+    };
+    const highlight = i => {
+      $$('.opt', list).forEach((el, j) => el.setAttribute('aria-selected', String(j === i)));
+      active = i;
+      if (i >= 0) { input.setAttribute('aria-activedescendant', `${list.id}-${i}`); $(`#${list.id}-${i}`).scrollIntoView({ block: 'nearest' }); }
+    };
+    const choose = a => { input.value = display(a); input.dataset.code = a.code; clearErr(input); close(); };
+    input.addEventListener('focus', () => { input.select(); render(''); });
+    input.addEventListener('input', () => { delete input.dataset.code; render(input.value); });
+    input.addEventListener('blur', () => setTimeout(close, 120));
+    input.addEventListener('keydown', e => {
+      if (list.hidden && (e.key === 'ArrowDown')) { render(input.value); }
+      if (e.key === 'ArrowDown') { e.preventDefault(); if (items.length) highlight(Math.min(active + 1, items.length - 1)); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); if (items.length) highlight(Math.max(active - 1, 0)); }
+      else if (e.key === 'Enter' && !list.hidden) { if (active >= 0) { e.preventDefault(); choose(items[active]); } else if (items.length === 1) { e.preventDefault(); choose(items[0]); } }
+      else if (e.key === 'Escape') { close(); }
+    });
+    list.addEventListener('mousedown', e => e.preventDefault());
+    list.addEventListener('click', e => { const li = e.target.closest('.opt'); if (li) choose(items[+li.dataset.i]); });
+  }
+
+  const form = $('#search');
+  const from = $('#from'), to = $('#to'), dep = $('#dep'), ret = $('#ret');
+  setupCombo(from); setupCombo(to);
+
+  /* ---------- Errors ---------- */
+  function setErr(input, msg) { input.setAttribute('aria-invalid', 'true'); $('#' + input.id + '-err').textContent = msg; }
+  function clearErr(input) { input.removeAttribute('aria-invalid'); const el = $('#' + input.id + '-err'); if (el) el.textContent = ''; }
+  [dep, ret].forEach(i => i.addEventListener('change', () => clearErr(i)));
+
+  /* ---------- Swap ---------- */
+  $('#swapBtn').addEventListener('click', e => {
+    const b = e.currentTarget;
+    [from.value, to.value] = [to.value, from.value];
+    const fc = from.dataset.code, tc = to.dataset.code;
+    tc ? (from.dataset.code = tc) : delete from.dataset.code;
+    fc ? (to.dataset.code = fc) : delete to.dataset.code;
+    clearErr(from); clearErr(to);
+    b.classList.toggle('spin');
+  });
+
+  /* ---------- Trip type ---------- */
+  $$('input[name="trip"]').forEach(r => r.addEventListener('change', () => {
+    const oneway = $('input[name="trip"]:checked').value === 'oneway';
+    form.classList.toggle('is-oneway', oneway);
+    ret.disabled = oneway; if (oneway) clearErr(ret);
+  }));
+
+  /* ---------- Dates ---------- */
+  const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+  dep.min = ret.min = iso(today);
+  dep.value = iso(addDays(today, 17)); ret.value = iso(addDays(today, 21));
+  dep.addEventListener('change', () => { ret.min = dep.value || iso(today); });
+  const kDate = v => { const [y, m, d] = v.split('-').map(Number); return `${m}월 ${d}일`; };
+
+  /* ---------- Passengers ---------- */
+  const pax = { adult: 1, child: 0, infant: 0 };
+  const paxBtn = $('#paxBtn'), paxPop = $('#paxPop'), paxHelp = $('#paxHelp');
+  const cabin = () => $('input[name="cabin"]:checked').value;
+  const paxSummary = () => {
+    const parts = [`성인 ${pax.adult}명`];
+    if (pax.child) parts.push(`소아 ${pax.child}명`);
+    if (pax.infant) parts.push(`유아 ${pax.infant}명`);
+    return `${parts.join(', ')}, ${cabin()}`;
+  };
+  const syncPax = (warn) => {
+    ['adult', 'child', 'infant'].forEach(k => $('#n-' + k).textContent = pax[k]);
+    const seated = pax.adult + pax.child;
+    $$('.stepper button', paxPop).forEach(b => {
+      const k = b.dataset.k, d = +b.dataset.d;
+      if (d < 0) b.disabled = k === 'adult' ? pax.adult <= 1 : pax[k] <= 0;
+      else b.disabled = k === 'infant' ? pax.infant >= pax.adult : seated >= 9;
+    });
+    if (pax.infant > pax.adult) pax.infant = pax.adult;
+    paxHelp.classList.toggle('warn', !!warn);
+    paxBtn.textContent = paxSummary();
+  };
+  paxPop.addEventListener('click', e => {
+    const b = e.target.closest('.stepper button'); if (!b || b.disabled) return;
+    const k = b.dataset.k; pax[k] += +b.dataset.d;
+    if (pax.infant > pax.adult) pax.infant = pax.adult;
+    const atLimit = (k !== 'infant' && pax.adult + pax.child >= 9) || (k === 'infant' && pax.infant >= pax.adult);
+    syncPax(atLimit && +b.dataset.d > 0);
+  });
+  $$('input[name="cabin"]').forEach(r => r.addEventListener('change', () => syncPax()));
+  const setPax = open => {
+    paxPop.hidden = !open; paxBtn.setAttribute('aria-expanded', String(open));
+    if (open) { const first = $('.stepper button:not(:disabled)', paxPop); first && first.focus(); }
+  };
+  paxBtn.addEventListener('click', () => setPax(paxPop.hidden));
+  $('#paxDone').addEventListener('click', () => { setPax(false); paxBtn.focus(); });
+  document.addEventListener('click', e => { if (!paxPop.hidden && !e.target.closest('.pax')) setPax(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !paxPop.hidden) { setPax(false); paxBtn.focus(); } });
+  syncPax();
+
+  /* ---------- Submit: validate -> skeleton -> sample results ---------- */
+  const resolve = input => {
+    if (input.dataset.code) return byCode(input.dataset.code);
+    const s = input.value.trim().toLowerCase(); if (!s) return null;
+    const m = AIRPORTS.filter(a => [a.code, a.label, a.name].some(v => v.toLowerCase().includes(s)));
+    if (m.length === 1) { input.value = display(m[0]); input.dataset.code = m[0].code; return m[0]; }
+    return undefined;
+  };
+  const results = $('#results'), submitBtn = $('#submitBtn');
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    [from, to, dep, ret].forEach(clearErr);
+    const oneway = form.classList.contains('is-oneway');
+    const a = resolve(from), b = resolve(to);
+    const bad = [];
+    if (a === null) { setErr(from, '출발지를 입력해 주세요.'); bad.push(from); }
+    else if (a === undefined) { setErr(from, '목록에서 공항을 골라 주세요.'); bad.push(from); }
+    if (b === null) { setErr(to, '어디로 가시나요? 도착지를 입력해 주세요.'); bad.push(to); }
+    else if (b === undefined) { setErr(to, '목록에서 공항을 골라 주세요.'); bad.push(to); }
+    if (a && b && a.code === b.code) { setErr(to, '출발지와 도착지가 같아요.'); bad.push(to); }
+    if (!dep.value) { setErr(dep, '가는 날을 선택해 주세요.'); bad.push(dep); }
+    if (!oneway) {
+      if (!ret.value) { setErr(ret, '오는 날을 선택해 주세요.'); bad.push(ret); }
+      else if (dep.value && ret.value < dep.value) { setErr(ret, '오는 날은 가는 날과 같거나 이후여야 해요.'); bad.push(ret); }
+    }
+    if (bad.length) { bad[0].focus(); return; }
+
+    submitBtn.disabled = true; submitBtn.querySelector('span').textContent = '찾는 중';
+    results.hidden = false;
+    results.innerHTML = `<div class="results-head"><p class="results-title">${a.label} → ${b.label} 항공편을 찾고 있어요</p></div>` +
+      Array.from({ length: 3 }, () => `<div class="res-row" aria-hidden="true"><div><div class="sk" style="width:70%"></div><div class="sk" style="width:40%"></div></div><div><div class="sk" style="width:80%"></div><div class="sk" style="width:50%"></div></div><div style="width:96px"><div class="sk"></div><div class="sk" style="width:60%;margin-left:auto"></div></div></div>`).join('');
+
+    setTimeout(() => {
+      submitBtn.disabled = false; submitBtn.querySelector('span').textContent = '항공권 검색';
+      const direct = $('#direct').checked;
+      const seed = (a.code + b.code).split('').reduce((s, c) => s + c.charCodeAt(0), 0);
+      const base = 120000 + (seed % 37) * 9100;
+      /* sample results (mock) */
+      const rows = [
+        { air: '대한항공', dep: '08:25', stop: '직항', p: base + 31800 },
+        { air: '아시아나항공', dep: '13:40', stop: '직항', p: base + 12600 },
+        { air: '대한항공', dep: '19:05', stop: '1회 경유', p: base - 8400 }
+      ].filter(r => !direct || r.stop === '직항').sort((x, y) => x.p - y.p);
+      const people = pax.adult + pax.child + pax.infant;
+      const when = oneway ? `${kDate(dep.value)} 출발` : `${kDate(dep.value)} - ${kDate(ret.value)}`;
+      results.innerHTML = `<div class="results-head"><p class="results-title">${a.label} → ${b.label}, ${oneway ? '편도' : '왕복'} ${when}</p><p class="results-note">예시 결과예요. 실제 서비스에서는 전체 결과 페이지로 이동해요.</p></div>` +
+        (rows.length ? rows.map(r => `<div class="res-row"><p class="res-air">${r.air}<small>${cabin()}</small></p><p class="res-time">${r.dep} 출발<small>${r.stop}</small></p><p class="res-price">${won(r.p * Math.max(1, people - pax.infant))}원<small>${people}명 총액, 세금 포함</small></p></div>`).join('')
+          : `<p class="results-note">조건에 맞는 직항편이 없어요. 직항만 보기를 끄고 다시 검색해 보세요.</p>`);
+    }, reduceMotion ? 300 : 1100);
+  });
+
+  /* ---------- Deals (mock prices) ---------- */
+  const DEALS = [
+    { r: 'japan', city: '오사카', from: 'ICN', to: 'KIX', dep: '2026-10-14', ret: '2026-10-17', info: '인천 출발, 직항 1시간 50분', price: 189300, seed: 'gd-osaka-street' },
+    { r: 'sea', city: '다낭', from: 'ICN', to: 'DAD', dep: '2026-10-21', ret: '2026-10-25', info: '인천 출발, 직항 4시간 35분', price: 276400, seed: 'gd-danang-beach' },
+    { r: 'japan', city: '후쿠오카', from: 'ICN', to: 'FUK', dep: '2026-10-09', ret: '2026-10-11', info: '인천 출발, 직항 1시간 20분', price: 142700, seed: 'gd-fukuoka-river' },
+    { r: 'domestic', city: '제주', from: 'GMP', to: 'CJU', dep: '2026-10-16', ret: '2026-10-18', info: '김포 출발, 직항 1시간 5분', price: 48900, seed: 'gd-jeju-coast' },
+    { r: 'sea', city: '방콕', from: 'ICN', to: 'BKK', dep: '2026-11-04', ret: '2026-11-09', info: '인천 출발, 직항 5시간 50분', price: 331200, seed: 'gd-bangkok-temple' },
+    { r: 'long', city: '파리', from: 'ICN', to: 'CDG', dep: '2026-11-12', ret: '2026-11-20', info: '인천 출발, 직항 14시간 10분', price: 1184000, seed: 'gd-paris-rooftops' },
+    { r: 'japan', city: '삿포로', from: 'ICN', to: 'CTS', dep: '2026-11-18', ret: '2026-11-22', info: '인천 출발, 직항 2시간 50분', price: 318900, seed: 'gd-sapporo-snow' },
+    { r: 'sea', city: '싱가포르', from: 'ICN', to: 'SIN', dep: '2026-10-28', ret: '2026-11-02', info: '인천 출발, 직항 6시간 25분', price: 402800, seed: 'gd-singapore-bay' },
+    { r: 'long', city: '뉴욕', from: 'ICN', to: 'JFK', dep: '2026-12-02', ret: '2026-12-10', info: '인천 출발, 직항 14시간 5분', price: 1392500, seed: 'gd-newyork-bridge' }
+  ];
+  const track = $('#dealTrack');
+  const md = v => v.slice(5).replace('-', '.');
+  const renderDeals = region => {
+    const list = DEALS.filter(d => region === 'all' || d.r === region);
+    track.innerHTML = list.length ? list.map((d, i) => `
+      <article class="deal">
+        <button class="deal-hit" type="button" data-i="${DEALS.indexOf(d)}" aria-label="${d.city} 특가, ${won(d.price)}원부터. 검색 조건 채우기">
+          <div class="deal-img"><img src="https://picsum.photos/seed/${d.seed}/640/480" width="640" height="480" alt="" loading="lazy"></div>
+          <div class="deal-body">
+            <h3 class="deal-city">${d.city}</h3>
+            <p class="deal-meta">${d.info}</p>
+            <p class="deal-meta num">${md(d.dep)} - ${md(d.ret)}</p>
+            <div class="deal-foot">
+              <p class="deal-price">${won(d.price)}<span>원부터</span></p>
+              <span class="deal-go">검색하기<i class="ph ph-arrow-right" aria-hidden="true"></i></span>
+            </div>
+          </div>
+        </button>
+      </article>`).join('')
+      : `<p class="deals-empty">이 지역 특가를 준비하고 있어요. 다른 지역을 둘러보세요.</p>`;
+    track.scrollLeft = 0;
+  };
+  renderDeals('all');
+  $$('.chip-btn[data-region]').forEach(btn => btn.addEventListener('click', () => {
+    $$('.chip-btn[data-region]').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+    if (reduceMotion) { renderDeals(btn.dataset.region); return; }
+    track.classList.add('fading');
+    setTimeout(() => { renderDeals(btn.dataset.region); track.classList.remove('fading'); }, 220);
+  }));
+  const step = () => (track.querySelector('.deal')?.getBoundingClientRect().width || 280) + 20;
+  $('#dealPrev').addEventListener('click', () => track.scrollBy({ left: -step() * 2, behavior: reduceMotion ? 'auto' : 'smooth' }));
+  $('#dealNext').addEventListener('click', () => track.scrollBy({ left: step() * 2, behavior: reduceMotion ? 'auto' : 'smooth' }));
+  track.addEventListener('click', e => {
+    const b = e.target.closest('.deal-hit'); if (!b) return;
+    const d = DEALS[+b.dataset.i];
+    const fa = byCode(d.from), ta = byCode(d.to);
+    from.value = display(fa); from.dataset.code = fa.code;
+    to.value = display(ta); to.dataset.code = ta.code;
+    $('input[name="trip"][value="round"]').checked = true;
+    form.classList.remove('is-oneway'); ret.disabled = false;
+    dep.value = d.dep; ret.value = d.ret; ret.min = d.dep;
+    [from, to, dep, ret].forEach(clearErr);
+    form.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+    form.classList.remove('flash'); void form.offsetWidth; form.classList.add('flash');
+  });
+
+  /* ---------- Scroll reveal (IntersectionObserver, no scroll listeners) ---------- */
+  const revealEls = $$('.reveal');
+  if (reduceMotion || !('IntersectionObserver' in window)) revealEls.forEach(el => el.classList.add('is-in'));
+  else {
+    const io = new IntersectionObserver(entries => entries.forEach(en => {
+      if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); }
+    }), { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+    revealEls.forEach(el => io.observe(el));
+  }
+})();
+</script>
+</body>
+</html>
