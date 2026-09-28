@@ -1,0 +1,1126 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>구름다리 항공권</title>
+<meta name="description" content="구름다리에서 국내외 항공사 요금을 한 번에 비교하고, 표시된 금액 그대로 예약하세요.">
+<meta name="theme-color" content="#0F6B5C">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --bg:#F7F7F4;
+  --bg-hero:#EBF3F0;
+  --surface:#FFFFFF;
+  --surface-2:#F1F2EF;
+  --text:#15201E;
+  --text-2:#475351;
+  --text-3:#636E6B;
+  --line:#E1E4E0;
+  --line-strong:#C9CFCB;
+  --accent:#0F6B5C;
+  --accent-hover:#0B5649;
+  --accent-soft:#E2EFEC;
+  --accent-ink:#0F6B5C;
+  --on-accent:#FFFFFF;
+  --danger:#B42318;
+  --shadow-card:0 1px 2px rgba(16,32,29,.06),0 12px 32px -12px rgba(16,32,29,.18);
+  --shadow-pop:0 4px 8px rgba(16,32,29,.06),0 24px 48px -16px rgba(16,32,29,.28);
+  --radius-s:10px;
+  --radius-m:14px;
+  --radius-l:20px;
+  --container:1200px;
+  --gutter:24px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0D1312;
+    --bg-hero:#10201D;
+    --surface:#151D1B;
+    --surface-2:#1B2523;
+    --text:#E9EFED;
+    --text-2:#B2BDBA;
+    --text-3:#8F9B98;
+    --line:#26312F;
+    --line-strong:#36433F;
+    --accent:#3FAE98;
+    --accent-hover:#5AC2AC;
+    --accent-soft:#15302B;
+    --accent-ink:#6CCBB6;
+    --on-accent:#05211C;
+    --danger:#F97066;
+    --shadow-card:0 1px 2px rgba(0,0,0,.3),0 12px 32px -12px rgba(0,0,0,.6);
+    --shadow-pop:0 4px 8px rgba(0,0,0,.3),0 24px 48px -16px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+  font-size:16px;
+  line-height:1.6;
+  word-break:keep-all;
+  overflow-wrap:break-word;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0;padding:0}
+h1,h2,h3,h4,p{margin:0}
+ul{margin:0;padding:0;list-style:none}
+.num{font-variant-numeric:tabular-nums}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+.container{width:100%;max-width:calc(var(--container) + var(--gutter)*2);margin:0 auto;padding:0 var(--gutter)}
+
+/* ---------- Header ---------- */
+.site-header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg-hero) 88%,transparent);backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid transparent;transition:border-color .2s}
+.site-header.is-scrolled{border-bottom-color:var(--line)}
+.header-inner{display:flex;align-items:center;gap:32px;height:68px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.02em;color:var(--text)}
+.brand-mark{width:32px;height:32px;flex:none}
+.nav{display:flex;gap:4px}
+.nav a{padding:8px 12px;border-radius:8px;font-size:15px;font-weight:500;color:var(--text-2)}
+.nav a:hover{color:var(--text);background:var(--surface-2)}
+.nav a[aria-current="page"]{color:var(--text);font-weight:700}
+.header-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:10px;font-size:15px;font-weight:600;white-space:nowrap;transition:background-color .15s,color .15s,border-color .15s}
+.btn-ghost{color:var(--text-2)}
+.btn-ghost:hover{color:var(--text);background:var(--surface-2)}
+.btn-outline{border:1px solid var(--line-strong);color:var(--text);background:var(--surface)}
+.btn-outline:hover{border-color:var(--text-3)}
+.btn-primary{background:var(--accent);color:var(--on-accent)}
+.btn-primary:hover{background:var(--accent-hover)}
+.menu-toggle{display:none;width:40px;height:40px;border-radius:10px;align-items:center;justify-content:center;color:var(--text)}
+.menu-toggle:hover{background:var(--surface-2)}
+.mobile-nav{display:none}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;z-index:2;background:var(--bg-hero);padding:56px 0 0}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:120px;background:var(--bg)}
+.hero-art{position:absolute;right:0;top:8px;width:min(620px,50vw);height:auto;aspect-ratio:620/300;color:var(--accent);opacity:.9;pointer-events:none}
+.hero-copy{position:relative;z-index:1;max-width:640px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--accent-ink);background:var(--surface);border:1px solid var(--line);padding:6px 12px 6px 8px;border-radius:999px}
+.eyebrow .dot{width:18px;height:18px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-size:11px;font-weight:800}
+.hero h1{margin-top:20px;font-size:clamp(32px,4.6vw,52px);line-height:1.22;letter-spacing:-.035em;font-weight:800}
+.hero h1 em{font-style:normal;color:var(--accent-ink)}
+.hero-sub{margin-top:16px;font-size:18px;line-height:1.65;color:var(--text-2);max-width:34em}
+
+/* ---------- Search ---------- */
+.search-wrap{position:relative;z-index:5;margin-top:36px}
+.search-card{background:var(--surface);border-radius:var(--radius-l);box-shadow:var(--shadow-card);border:1px solid var(--line);padding:20px 20px 16px}
+.search-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.trip-tabs{display:inline-flex;background:var(--surface-2);border-radius:10px;padding:4px}
+.trip-tabs button{height:36px;padding:0 16px;border-radius:7px;font-size:15px;font-weight:600;color:var(--text-2)}
+.trip-tabs button[aria-checked="true"]{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.08),0 0 0 1px var(--line)}
+.search-options{display:flex;gap:20px;flex-wrap:wrap}
+.check{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--text-2);cursor:pointer;user-select:none}
+.check input{appearance:none;-webkit-appearance:none;width:18px;height:18px;margin:0;border:1.5px solid var(--line-strong);border-radius:5px;background:var(--surface);display:grid;place-items:center;cursor:pointer}
+.check input:checked{background:var(--accent);border-color:var(--accent)}
+.check input:checked::after{content:"";width:9px;height:5px;border:2px solid var(--on-accent);border-top:0;border-right:0;transform:translateY(-1px) rotate(-45deg)}
+
+.search-grid{display:grid;grid-template-columns:1fr 1fr .9fr .9fr 1.15fr auto;border:1px solid var(--line-strong);border-radius:var(--radius-m);position:relative}
+.field{position:relative;min-width:0;padding:12px 16px;border-right:1px solid var(--line);cursor:text;transition:background-color .15s}
+.field:hover{background:var(--surface-2)}
+.field:first-child{border-radius:var(--radius-m) 0 0 var(--radius-m);padding-right:26px}
+.field[data-ap="to"]{padding-left:28px}
+.field-label{display:block;font-size:13px;font-weight:600;color:var(--text-3);margin-bottom:2px}
+.field-input{width:100%;border:0;background:transparent;padding:0;font-size:18px;font-weight:700;letter-spacing:-.01em;outline:none;text-overflow:ellipsis;min-width:0}
+.field-input::placeholder{color:var(--text-3);font-weight:500}
+.field-hint{display:block;font-size:13px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.field.is-disabled{cursor:not-allowed}
+.field.is-disabled .field-value{color:var(--text-3);font-weight:500}
+.field.is-invalid{box-shadow:inset 0 0 0 2px var(--danger);border-radius:var(--radius-m)}
+.field-error{display:none;font-size:13px;color:var(--danger);font-weight:600}
+.field.is-invalid .field-error{display:block}
+.field.is-invalid .field-hint{display:none}
+.field-value{display:block;font-size:18px;font-weight:700;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left;width:100%}
+.field-btn{display:block;width:100%;text-align:left;cursor:pointer}
+.date-native{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;border:0}
+.field.is-disabled .date-native{pointer-events:none}
+
+.swap{position:absolute;left:0;top:50%;transform:translate(-50%,-50%);z-index:3;width:36px;height:36px;border-radius:50%;background:var(--surface);border:1px solid var(--line-strong);display:grid;place-items:center;color:var(--text-2);transition:transform .25s,color .15s,border-color .15s}
+.swap:hover{color:var(--accent-ink);border-color:var(--accent)}
+.swap.spin{transform:translate(-50%,-50%) rotate(180deg)}
+
+.search-submit{display:flex;align-items:stretch;padding:8px}
+.search-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:134px;padding:0 24px;border-radius:10px;background:var(--accent);color:var(--on-accent);font-size:17px;font-weight:700;transition:background-color .15s}
+.search-btn:hover{background:var(--accent-hover)}
+
+.search-foot{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+.search-foot-label{font-size:13px;font-weight:600;color:var(--text-3);margin-right:2px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:14px;color:var(--text-2);white-space:nowrap;transition:border-color .15s,color .15s,background-color .15s}
+.chip:hover{border-color:var(--line-strong);color:var(--text)}
+.chip small{font-size:13px;color:var(--text-3)}
+
+/* Airport dropdown */
+.popover{position:absolute;top:calc(100% + 8px);left:0;z-index:20;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-m);box-shadow:var(--shadow-pop);padding:8px;display:none}
+.popover.open{display:block}
+.ap-pop{width:min(360px,calc(100vw - 32px));max-height:min(400px,60vh);overflow-y:auto;overscroll-behavior:contain}
+.ap-group{font-size:13px;font-weight:600;color:var(--text-3);padding:8px 10px 4px}
+.ap-item{display:flex;align-items:center;gap:12px;width:100%;padding:10px;border-radius:10px;text-align:left}
+.ap-item:hover,.ap-item.active{background:var(--surface-2)}
+.ap-code{flex:none;width:44px;height:32px;border-radius:8px;background:var(--accent-soft);color:var(--accent-ink);font-weight:800;font-size:13px;letter-spacing:.04em;display:grid;place-items:center}
+.ap-name{font-size:15px;font-weight:600;line-height:1.35}
+.ap-sub{font-size:13px;color:var(--text-3);line-height:1.35}
+.ap-empty{padding:16px 10px;font-size:14px;color:var(--text-3)}
+
+/* Passenger popover */
+.pax-pop{right:0;left:auto;width:340px;padding:16px}
+.pax-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}
+.pax-row + .pax-row{border-top:1px solid var(--line)}
+.pax-name{font-size:15px;font-weight:600;line-height:1.35}
+.pax-age{font-size:13px;color:var(--text-3)}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper button{width:34px;height:34px;border-radius:50%;border:1px solid var(--line-strong);display:grid;place-items:center;color:var(--text)}
+.stepper button:hover:not(:disabled){border-color:var(--accent);color:var(--accent-ink)}
+.stepper button:disabled{opacity:.35;cursor:not-allowed}
+.stepper output{min-width:24px;text-align:center;font-weight:700;font-size:16px}
+.pax-sep{height:1px;background:var(--line);margin:8px 0 14px}
+.pax-title{font-size:13px;font-weight:600;color:var(--text-3);margin-bottom:8px}
+.cabin-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cabin-list label{position:relative}
+.cabin-list input{position:absolute;opacity:0}
+.cabin-list span{display:flex;align-items:center;justify-content:center;height:40px;border-radius:10px;border:1px solid var(--line-strong);font-size:14px;font-weight:600;color:var(--text-2);cursor:pointer;text-align:center;padding:0 6px}
+.cabin-list input:checked + span{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink)}
+.cabin-list input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+.pax-done{margin-top:14px;width:100%}
+
+/* ---------- Assurance strip ---------- */
+.assure{position:relative;z-index:1;margin-top:28px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;padding:4px 4px 0}
+.assure-item{display:flex;gap:12px;align-items:flex-start}
+.assure-icon{flex:none;width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--accent-ink)}
+.assure-item strong{display:block;font-size:15px;font-weight:700;line-height:1.4}
+.assure-item span{display:block;font-size:13px;color:var(--text-3);line-height:1.5}
+
+/* ---------- Sections ---------- */
+section{scroll-margin-top:80px}
+.section{padding:96px 0 0}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:28px;flex-wrap:wrap}
+.section-kicker{font-size:14px;font-weight:700;color:var(--accent-ink);margin-bottom:8px}
+.section-title{font-size:clamp(24px,2.6vw,32px);line-height:1.3;letter-spacing:-.03em;font-weight:800}
+.section-desc{margin-top:8px;color:var(--text-2);font-size:16px}
+.link-more{display:inline-flex;align-items:center;gap:4px;font-size:15px;font-weight:600;color:var(--text-2)}
+.link-more:hover{color:var(--accent-ink)}
+
+/* Deals */
+.filters{display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.filters::-webkit-scrollbar{display:none}
+.filters .chip[aria-pressed="true"]{background:var(--text);border-color:var(--text);color:var(--bg)}
+.deal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.deal{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-m);overflow:hidden;transition:transform .2s,box-shadow .2s,border-color .2s}
+.deal:hover{transform:translateY(-3px);box-shadow:var(--shadow-card);border-color:var(--line-strong)}
+.deal[hidden]{display:none}
+.deal-board{position:relative;padding:18px 18px 16px;background:var(--accent-soft);color:var(--accent-ink)}
+.deal-route{display:flex;align-items:center;gap:10px;font-weight:800;font-size:26px;letter-spacing:.02em;line-height:1}
+.deal-route svg{flex:1;min-width:24px;height:12px;opacity:.7}
+.deal-cities{display:flex;justify-content:space-between;margin-top:6px;font-size:13px;font-weight:600;opacity:.9}
+.deal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.deal-badge{flex:none;margin-top:2px;font-size:12px;font-weight:800;padding:2px 7px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);letter-spacing:.01em}
+.deal-body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px;flex:1}
+.deal-title{font-size:18px;font-weight:700;letter-spacing:-.02em;line-height:1.35}
+.deal-meta{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:14px;color:var(--text-3)}
+.deal-meta span+span::before{content:"";display:inline-block;width:3px;height:3px;border-radius:50%;background:var(--line-strong);vertical-align:middle;margin-right:10px;transform:translateY(-2px)}
+.deal-price{margin-top:auto;display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding-top:12px;border-top:1px dashed var(--line)}
+.deal-price small{font-size:13px;color:var(--text-3)}
+.deal-price strong{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.deal-price strong span{font-size:15px;font-weight:600;margin-left:1px}
+.deal-price s{display:block;font-size:13px;color:var(--text-3);text-align:right;line-height:1.2}
+
+/* Price alert */
+.alert-block{display:grid;grid-template-columns:1fr 1.25fr;gap:48px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-l);padding:48px}
+.alert-copy .section-title{margin-top:0}
+.alert-list{margin-top:24px;display:grid;gap:12px}
+.alert-list li{display:flex;gap:10px;font-size:15px;color:var(--text-2);line-height:1.55}
+.alert-list svg{flex:none;margin-top:3px;color:var(--accent-ink)}
+.alert-cta{margin-top:28px;display:flex;gap:10px;flex-wrap:wrap}
+.btn-lg{height:48px;padding:0 20px;font-size:16px;border-radius:12px}
+.btn-primary[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-ink);box-shadow:inset 0 0 0 1px var(--accent)}
+
+.chart{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius-m);padding:22px 22px 18px}
+.chart-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.chart-route{font-size:15px;font-weight:700}
+.chart-sub{font-size:13px;color:var(--text-3)}
+.chart-low{text-align:right}
+.chart-low small{display:block;font-size:13px;color:var(--text-3)}
+.chart-low strong{font-size:22px;font-weight:800;color:var(--accent-ink);letter-spacing:-.02em}
+.bars{margin-top:22px;display:grid;grid-template-columns:repeat(14,1fr);gap:6px;align-items:end;height:170px;position:relative}
+.bars::before{content:"";position:absolute;left:0;right:0;border-top:1.5px dashed var(--text-3);bottom:var(--target,40%);z-index:1;pointer-events:none;opacity:.7}
+.bar{position:relative;display:flex;flex-direction:column;justify-content:flex-end;height:100%;cursor:default}
+.bar i{display:block;border-radius:6px 6px 3px 3px;background:var(--line-strong);height:var(--h);transition:background-color .15s}
+.bar:hover i{background:var(--text-3)}
+.bar.low i{background:var(--accent)}
+.bar .tip{position:absolute;bottom:calc(var(--h) + 8px);left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);font-size:12px;font-weight:700;padding:3px 7px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s}
+.bar:hover .tip,.bar.low .tip{opacity:1}
+.bar.low .tip{background:var(--accent);color:var(--on-accent)}
+.bar-days{display:grid;grid-template-columns:repeat(14,1fr);gap:6px;margin-top:8px;font-size:12px;color:var(--text-3);text-align:center}
+.bar-days .we{color:var(--text-2);font-weight:600}
+.chart-legend{margin-top:14px;display:flex;gap:16px;font-size:13px;color:var(--text-3);flex-wrap:wrap}
+.chart-legend span{display:inline-flex;align-items:center;gap:6px}
+.chart-legend i{width:10px;height:10px;border-radius:3px;background:var(--accent)}
+.chart-legend i.line{height:0;border-top:1.5px dashed var(--text-3);background:none;width:14px;border-radius:0}
+
+/* Benefits */
+.benefit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.benefit{padding:28px;border-radius:var(--radius-m);background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.benefit-num{font-size:40px;font-weight:800;letter-spacing:-.04em;line-height:1.1;color:var(--accent-ink)}
+.benefit-num span{font-size:20px;font-weight:700;margin-left:2px}
+.benefit h3{font-size:18px;font-weight:700;letter-spacing:-.02em;line-height:1.4}
+.benefit p{font-size:15px;color:var(--text-2);line-height:1.6}
+.benefit .fine{margin-top:auto;padding-top:8px;font-size:13px;color:var(--text-3)}
+
+/* Trust */
+.trust{display:grid;grid-template-columns:1fr 1.6fr;gap:48px;align-items:start}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:28px 24px;margin-top:28px}
+.stat strong{display:block;font-size:32px;font-weight:800;letter-spacing:-.03em;line-height:1.2}
+.stat span{font-size:14px;color:var(--text-3)}
+.reviews{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.review{padding:24px;border-radius:var(--radius-m);background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:14px}
+.review:first-child{grid-column:span 2}
+.stars{display:flex;gap:2px;color:var(--accent-ink)}
+.review blockquote{margin:0;font-size:16px;line-height:1.7;color:var(--text)}
+.review:first-child blockquote{font-size:18px;letter-spacing:-.01em}
+.review-by{display:flex;align-items:center;gap:10px;margin-top:auto}
+.review-by .avatar{flex:none;width:36px;height:36px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:14px;font-weight:700;color:var(--text-2)}
+.review-by strong{display:block;font-size:14px;font-weight:700;line-height:1.3}
+.review-by span{display:block;font-size:13px;color:var(--text-3);line-height:1.3}
+.partners{margin-top:48px;padding-top:28px;border-top:1px solid var(--line);display:flex;align-items:center;gap:16px 32px;flex-wrap:wrap}
+.partners p{font-size:14px;color:var(--text-3);font-weight:600}
+.partners ul{display:flex;gap:10px 28px;flex-wrap:wrap}
+.partners li{font-size:15px;font-weight:700;color:var(--text-2);letter-spacing:-.01em}
+
+/* App band */
+.app-band{margin-top:96px;background:var(--accent);color:#fff;border-radius:var(--radius-l);padding:48px;display:grid;grid-template-columns:1.3fr 1fr;gap:32px;align-items:center;position:relative;overflow:hidden}
+.app-band h2{font-size:clamp(24px,2.6vw,32px);line-height:1.3;letter-spacing:-.03em;font-weight:800}
+.app-band p{margin-top:10px;font-size:16px;opacity:.88;line-height:1.6}
+.app-band .btns{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;position:relative;z-index:1}
+.store-btn{display:inline-flex;align-items:center;gap:10px;height:52px;padding:0 18px;border-radius:12px;background:#fff;color:#0B3F37;font-weight:700;font-size:15px}
+.store-btn:hover{background:#EAF4F1}
+.store-btn small{display:block;font-size:12px;font-weight:600;opacity:.75;line-height:1.1}
+.store-btn b{display:block;line-height:1.2}
+.app-band-art{position:absolute;right:-60px;bottom:-80px;width:360px;opacity:.14;color:#fff;pointer-events:none}
+@media (prefers-color-scheme: dark){
+  .app-band{background:#0F5448}
+}
+
+/* Footer */
+.site-footer{margin-top:96px;border-top:1px solid var(--line);background:var(--surface);padding:56px 0 40px;font-size:14px;color:var(--text-2)}
+.footer-top{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:32px}
+.footer-cs strong{display:block;font-size:24px;font-weight:800;color:var(--text);letter-spacing:-.02em;margin-top:14px}
+.footer-cs p{margin-top:4px;font-size:14px;color:var(--text-3);line-height:1.6}
+.footer-col h3{font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px}
+.footer-col li+li{margin-top:8px}
+.footer-col a:hover{color:var(--text)}
+.footer-legal{margin-top:40px;padding-top:24px;border-top:1px solid var(--line)}
+.legal-links{display:flex;gap:6px 20px;flex-wrap:wrap;font-size:14px;margin-bottom:16px}
+.legal-links a{color:var(--text-2)}
+.legal-links a.strong{color:var(--text);font-weight:700}
+.company{font-size:13px;color:var(--text-3);line-height:1.8}
+.company span{display:inline-block;margin-right:14px}
+.disclaimer{margin-top:14px;font-size:13px;color:var(--text-3);line-height:1.7;max-width:880px}
+.copyright{margin-top:14px;font-size:13px;color:var(--text-3)}
+
+/* Toast */
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);z-index:100;background:var(--text);color:var(--bg);padding:12px 18px;border-radius:12px;font-size:15px;font-weight:600;box-shadow:var(--shadow-pop);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:calc(100vw - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1100px){
+  .search-grid{grid-template-columns:1fr 1fr 1fr 1fr}
+  .field:nth-child(1){grid-column:1 / 3;border-bottom:1px solid var(--line)}
+  .field:nth-child(2){grid-column:3 / 5;border-right:0;border-bottom:1px solid var(--line)}
+  .field:first-child{border-radius:var(--radius-m) 0 0 0}
+  .field-pax{grid-column:span 1;border-right:0}
+  .search-submit{grid-column:1 / -1;padding:0 8px 8px}
+  .search-btn{width:100%;height:52px}
+  .deal-grid{grid-template-columns:repeat(2,1fr)}
+  .assure{grid-template-columns:repeat(2,1fr)}
+  .hero-art{opacity:.5}
+}
+@media (max-width:900px){
+  .nav,.header-actions .btn-ghost{display:none}
+  .menu-toggle{display:inline-flex}
+  .mobile-nav.open{display:block;border-top:1px solid var(--line);background:var(--bg-hero);padding:8px 0 16px}
+  .mobile-nav a{display:block;padding:12px var(--gutter);font-size:16px;font-weight:600;color:var(--text)}
+  .alert-block{grid-template-columns:1fr;gap:32px;padding:32px}
+  .trust{grid-template-columns:1fr;gap:32px}
+  .benefit-grid{grid-template-columns:1fr}
+  .benefit{flex-direction:row;flex-wrap:wrap;align-items:baseline;column-gap:16px}
+  .benefit-num{flex:none;min-width:110px}
+  .benefit h3{flex:1;min-width:180px}
+  .benefit p,.benefit .fine{flex-basis:100%}
+  .app-band{grid-template-columns:1fr;padding:36px}
+  .app-band .btns{justify-content:flex-start}
+  .footer-top{grid-template-columns:1fr 1fr}
+  .footer-cs{grid-column:1 / -1}
+}
+@media (max-width:640px){
+  :root{--gutter:16px}
+  .header-inner{height:60px;gap:12px}
+  .header-actions .btn-outline{display:none}
+  .hero{padding-top:32px}
+  .hero-art{display:none}
+  .hero-sub{font-size:16px}
+  .eyebrow{font-size:13px}
+  .search-wrap{margin-top:24px}
+  .search-card{padding:14px 14px 12px;border-radius:16px}
+  .search-top{margin-bottom:12px}
+  .trip-tabs{width:100%}
+  .trip-tabs button{flex:1}
+  .search-options{gap:16px}
+  .search-grid{grid-template-columns:1fr 1fr}
+  .field,.field:first-child,.field[data-ap="to"]{padding:10px 60px 10px 14px}
+  .field-date,.field-pax{padding-right:14px!important}
+  .field:nth-child(1){grid-column:1 / -1;border-right:0}
+  .field:nth-child(2){grid-column:1 / -1}
+  .field:nth-child(3){border-bottom:1px solid var(--line)}
+  .field:nth-child(4){border-right:0;border-bottom:1px solid var(--line)}
+  .field-pax{grid-column:1 / -1}
+  .field-input,.field-value{font-size:17px}
+  .swap{left:auto;right:14px;top:0;transform:translateY(-50%) rotate(90deg)}
+  .swap.spin{transform:translateY(-50%) rotate(270deg)}
+  .pax-pop,.ap-pop{left:0;right:0;width:auto}
+  .search-foot{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-14px;padding-right:14px}
+  .search-foot::-webkit-scrollbar{display:none}
+  .assure{grid-template-columns:1fr 1fr;gap:16px 12px}
+  .assure-icon{width:32px;height:32px}
+  .assure-item strong{font-size:14px}
+  .section{padding-top:64px}
+  .deal-grid{grid-template-columns:1fr}
+  .deal{flex-direction:row}
+  .deal-board{flex:none;width:112px;display:flex;flex-direction:column;justify-content:center;padding:14px}
+  .deal-route{flex-direction:column;align-items:flex-start;gap:4px;font-size:20px}
+  .deal-route svg{display:none}
+  .deal-route .from{font-size:13px;opacity:.75}
+  .deal-cities{display:none}
+  .deal-body{padding:14px;gap:8px}
+  .deal-title{font-size:16px}
+  .deal-meta{font-size:13px}
+  .deal-meta span:first-child{flex-basis:100%}
+  .deal-meta span:nth-child(2)::before{display:none}
+  .deal-price{padding-top:8px}
+  .deal-price strong{font-size:19px}
+  .alert-block{padding:24px 18px;border-radius:16px}
+  .chart{padding:16px 14px 14px}
+  .chart-low{text-align:left}
+  .bars{gap:4px;height:140px}
+  .bar-days{gap:4px;font-size:12px}
+  .bar .tip{font-size:12px}
+  .reviews{grid-template-columns:1fr}
+  .review:first-child{grid-column:auto}
+  .stat strong{font-size:26px}
+  .app-band{margin-top:64px;padding:28px 22px;border-radius:16px}
+  .site-footer{margin-top:64px;padding-top:40px}
+  .footer-top{gap:28px 16px}
+  .company span{display:block;margin-right:0}
+}
+@media (prefers-reduced-motion: reduce){
+  *{transition:none!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-plane" viewBox="0 0 24 24"><path fill="currentColor" d="M21.5 15.5v-1.8l-8-5V3.3a1.5 1.5 0 0 0-3 0v5.4l-8 5v1.8l8-2.5v5.4l-2 1.5v1.4l3.5-1 3.5 1v-1.4l-2-1.5V13l8 2.5Z"/></symbol>
+    <symbol id="i-swap" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m9 6 6 6-6 6"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path fill="currentColor" d="m12 2.8 2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3L2.9 9.5l6.3-.9L12 2.8Z"/></symbol>
+    <symbol id="i-dash" viewBox="0 0 100 12" preserveAspectRatio="none"><path d="M0 6h92" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 4" vector-effect="non-scaling-stroke" fill="none"/><path d="M92 2l6 4-6 4" fill="none" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke"/></symbol>
+  </defs>
+</svg>
+
+<header class="site-header" id="top">
+  <div class="container header-inner">
+    <a class="brand" href="#top" aria-label="구름다리 홈">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect width="32" height="32" rx="9" fill="#0F6B5C"/>
+        <path d="M6 22c2.8-7.2 7-10.8 10-10.8S23.2 14.8 26 22" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M11 22v-4.2M16 22v-5.8M21 22v-4.2" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>
+        <circle cx="23.5" cy="9" r="2.2" fill="#fff" opacity=".9"/>
+      </svg>
+      구름다리
+    </a>
+    <nav class="nav" aria-label="주요 메뉴">
+      <a href="#top" aria-current="page">항공권</a>
+      <a href="#deals">특가</a>
+      <a href="#alert">가격 알림</a>
+      <a href="#benefits">혜택</a>
+      <a href="#footer">고객센터</a>
+    </nav>
+    <div class="header-actions">
+      <a class="btn btn-ghost" href="#">예약 조회</a>
+      <a class="btn btn-outline" href="#">로그인</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobileNav" aria-label="메뉴 열기">
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+  <nav class="mobile-nav" id="mobileNav" aria-label="모바일 메뉴">
+    <a href="#deals">특가 항공권</a>
+    <a href="#alert">가격 알림</a>
+    <a href="#benefits">혜택</a>
+    <a href="#">예약 조회</a>
+    <a href="#">로그인 · 회원가입</a>
+    <a href="#footer">고객센터</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero" aria-labelledby="heroTitle">
+    <svg class="hero-art" viewBox="0 0 620 300" aria-hidden="true">
+      <path d="M40 270C140 90 330 30 580 70" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 7" opacity=".55"/>
+      <circle cx="40" cy="270" r="5" fill="currentColor" opacity=".7"/>
+      <circle cx="580" cy="70" r="5" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".7"/>
+      <g transform="translate(372 52) rotate(72)"><use href="#i-plane" width="26" height="26" x="-13" y="-13"/></g>
+      <g fill="currentColor" opacity=".08">
+        <path d="M430 190a34 34 0 0 1 64-14 26 26 0 0 1 36 24 20 20 0 0 1-4 40H440a26 26 0 0 1-10-50Z"/>
+        <path d="M150 90a22 22 0 0 1 41-9 17 17 0 0 1 23 16 13 13 0 0 1-3 26h-55a17 17 0 0 1-6-33Z"/>
+      </g>
+    </svg>
+
+    <div class="container">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="dot" aria-hidden="true">%</span>10월 출발 항공권, 최대 37% 할인 중</span>
+        <h1 id="heroTitle">가고 싶은 곳까지,<br><em>가장 가벼운 다리</em>를 놓아드려요</h1>
+        <p class="hero-sub">국내외 항공사 120여 곳의 요금을 한 번에 비교하세요. 보이는 금액이 결제 금액이에요. 숨은 수수료는 없어요.</p>
+      </div>
+
+      <div class="search-wrap">
+        <form class="search-card" id="searchForm" novalidate aria-label="항공권 검색">
+          <div class="search-top">
+            <div class="trip-tabs" role="radiogroup" aria-label="여정 유형">
+              <button type="button" role="radio" aria-checked="true" data-trip="round">왕복</button>
+              <button type="button" role="radio" aria-checked="false" data-trip="oneway">편도</button>
+              <button type="button" role="radio" aria-checked="false" data-trip="multi">다구간</button>
+            </div>
+            <div class="search-options">
+              <label class="check"><input type="checkbox" name="direct"> 직항만</label>
+              <label class="check"><input type="checkbox" name="bag" checked> 위탁 수하물 포함 요금</label>
+            </div>
+          </div>
+
+          <div class="search-grid">
+            <div class="field" data-ap="from">
+              <label class="field-label" for="fromInput">출발지</label>
+              <input class="field-input" id="fromInput" type="text" autocomplete="off" value="서울/인천" role="combobox" aria-expanded="false" aria-controls="fromList" aria-autocomplete="list">
+              <span class="field-hint" data-hint>ICN · 인천국제공항</span>
+              <span class="field-error">출발지를 선택해 주세요</span>
+              <div class="popover ap-pop" id="fromList" role="listbox" aria-label="출발지 선택"></div>
+            </div>
+            <div class="field" data-ap="to">
+              <label class="field-label" for="toInput">도착지</label>
+              <input class="field-input" id="toInput" type="text" autocomplete="off" placeholder="어디로 떠나세요?" role="combobox" aria-expanded="false" aria-controls="toList" aria-autocomplete="list">
+              <span class="field-hint" data-hint>도시나 공항 이름으로 검색</span>
+              <span class="field-error">도착지를 선택해 주세요</span>
+              <div class="popover ap-pop" id="toList" role="listbox" aria-label="도착지 선택"></div>
+              <button type="button" class="swap" id="swapBtn" aria-label="출발지와 도착지 바꾸기"><svg width="18" height="18" aria-hidden="true"><use href="#i-swap"/></svg></button>
+            </div>
+            <div class="field field-date" id="departField">
+              <span class="field-label" id="departLabel">가는 날</span>
+              <span class="field-value num" id="departText">10월 15일 (목)</span>
+              <span class="field-hint" id="departHint">출발 17일 전</span>
+              <input class="date-native" type="date" id="departDate" value="2026-10-15" min="2026-09-28" aria-labelledby="departLabel">
+            </div>
+            <div class="field field-date" id="returnField">
+              <span class="field-label" id="returnLabel">오는 날</span>
+              <span class="field-value num" id="returnText">10월 19일 (월)</span>
+              <span class="field-hint" id="returnHint">4박 5일</span>
+              <input class="date-native" type="date" id="returnDate" value="2026-10-19" min="2026-10-15" aria-labelledby="returnLabel">
+            </div>
+            <div class="field field-pax">
+              <span class="field-label" id="paxLabel">승객 · 좌석 등급</span>
+              <button type="button" class="field-btn" id="paxBtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="paxPop" aria-describedby="paxLabel">
+                <span class="field-value" id="paxText">성인 1명</span>
+                <span class="field-hint" id="cabinText">일반석</span>
+              </button>
+              <div class="popover pax-pop" id="paxPop" role="dialog" aria-label="승객 수와 좌석 등급">
+                <div class="pax-row">
+                  <div><div class="pax-name">성인</div><div class="pax-age">만 12세 이상</div></div>
+                  <div class="stepper" data-type="adult">
+                    <button type="button" data-step="-1" aria-label="성인 한 명 빼기"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+                    <output class="num" aria-live="polite">1</output>
+                    <button type="button" data-step="1" aria-label="성인 한 명 더하기"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10M7 2v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+                  </div>
+                </div>
+                <div class="pax-row">
+                  <div><div class="pax-name">소아</div><div class="pax-age">만 2세 ~ 11세</div></div>
+                  <div class="stepper" data-type="child">
+                    <button type="button" data-step="-1" aria-label="소아 한 명 빼기"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+                    <output class="num" aria-live="polite">0</output>
+                    <button type="button" data-step="1" aria-label="소아 한 명 더하기"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10M7 2v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+                  </div>
+                </div>
+                <div class="pax-row">
+                  <div><div class="pax-name">유아</div><div class="pax-age">만 2세 미만 · 좌석 미점유</div></div>
+                  <div class="stepper" data-type="infant">
+                    <button type="button" data-step="-1" aria-label="유아 한 명 빼기"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+                    <output class="num" aria-live="polite">0</output>
+                    <button type="button" data-step="1" aria-label="유아 한 명 더하기"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10M7 2v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+                  </div>
+                </div>
+                <div class="pax-sep"></div>
+                <div class="pax-title" id="cabinTitle">좌석 등급</div>
+                <div class="cabin-list" role="radiogroup" aria-labelledby="cabinTitle">
+                  <label><input type="radio" name="cabin" value="일반석" checked><span>일반석</span></label>
+                  <label><input type="radio" name="cabin" value="프리미엄 일반석"><span>프리미엄 일반석</span></label>
+                  <label><input type="radio" name="cabin" value="비즈니스석"><span>비즈니스석</span></label>
+                  <label><input type="radio" name="cabin" value="일등석"><span>일등석</span></label>
+                </div>
+                <button type="button" class="btn btn-primary pax-done" id="paxDone">완료</button>
+              </div>
+            </div>
+            <div class="search-submit">
+              <button type="submit" class="search-btn">
+                <svg width="20" height="20" aria-hidden="true"><use href="#i-search"/></svg>
+                항공권 검색
+              </button>
+            </div>
+          </div>
+
+          <div class="search-foot">
+            <span class="search-foot-label">최근 검색</span>
+            <button type="button" class="chip" data-quick="FUK">인천 → 후쿠오카 <small>11월 2일</small></button>
+            <button type="button" class="chip" data-quick="DAD">인천 → 다낭 <small>12월 20일</small></button>
+            <button type="button" class="chip" data-quick="CJU">김포 → 제주 <small>10월 9일</small></button>
+          </div>
+        </form>
+      </div>
+
+      <ul class="assure" aria-label="구름다리 약속">
+        <li class="assure-item">
+          <span class="assure-icon"><svg width="18" height="18" aria-hidden="true"><use href="#i-check"/></svg></span>
+          <div><strong>표시 요금 = 결제 요금</strong><span>유류할증료·세금 모두 포함</span></div>
+        </li>
+        <li class="assure-item">
+          <span class="assure-icon"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></span>
+          <div><strong>24시간 무료 취소</strong><span>예약 후 하루 안에는 수수료 없이</span></div>
+        </li>
+        <li class="assure-item">
+          <span class="assure-icon"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18v-5a7 7 0 0 1 14 0v5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="13" width="4" height="6" rx="1.5" fill="currentColor"/><rect x="17" y="13" width="4" height="6" rx="1.5" fill="currentColor"/></svg></span>
+          <div><strong>365일 상담원 연결</strong><span>결항·지연 시 대체편 안내</span></div>
+        </li>
+        <li class="assure-item">
+          <span class="assure-icon"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.5c0 4.6 3.1 8.2 7.5 9.5 4.4-1.3 7.5-4.9 7.5-9.5V6L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div><strong>안전한 결제 보호</strong><span>전자보증보험 가입 완료</span></div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 특가 노선 -->
+  <section class="section" id="deals" aria-labelledby="dealsTitle">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">이번 주 특가</p>
+          <h2 class="section-title" id="dealsTitle">지금 떠나기 좋은 노선</h2>
+          <p class="section-desc">최근 24시간 동안 구름다리 이용자가 찾은 가장 낮은 왕복 요금이에요.</p>
+        </div>
+        <a class="link-more" href="#">특가 전체 보기 <svg width="16" height="16" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </div>
+
+      <div class="filters" role="group" aria-label="지역 필터">
+        <button type="button" class="chip" aria-pressed="true" data-filter="all">전체</button>
+        <button type="button" class="chip" aria-pressed="false" data-filter="jp">일본</button>
+        <button type="button" class="chip" aria-pressed="false" data-filter="sea">동남아</button>
+        <button type="button" class="chip" aria-pressed="false" data-filter="cn">중화권</button>
+        <button type="button" class="chip" aria-pressed="false" data-filter="kr">국내</button>
+      </div>
+
+      <div class="deal-grid" id="dealGrid"></div>
+    </div>
+  </section>
+
+  <!-- 가격 알림 -->
+  <section class="section" id="alert" aria-labelledby="alertTitle">
+    <div class="container">
+      <div class="alert-block">
+        <div class="alert-copy">
+          <p class="section-kicker">가격 알림</p>
+          <h2 class="section-title" id="alertTitle">원하는 가격이 되면<br>먼저 알려드릴게요</h2>
+          <p class="section-desc">매일 새벽 요금이 바뀌어요. 노선과 목표 금액만 정해두면, 그 아래로 내려가는 순간 앱 알림과 카카오톡으로 알려드려요.</p>
+          <ul class="alert-list">
+            <li><svg width="18" height="18" aria-hidden="true"><use href="#i-check"/></svg>날짜별 최저가를 한눈에 비교</li>
+            <li><svg width="18" height="18" aria-hidden="true"><use href="#i-check"/></svg>앞뒤 3일 유연 검색으로 더 싼 날 추천</li>
+            <li><svg width="18" height="18" aria-hidden="true"><use href="#i-check"/></svg>알림은 최대 10개 노선까지 무료</li>
+          </ul>
+          <div class="alert-cta">
+            <button type="button" class="btn btn-primary btn-lg" id="alertBtn" aria-pressed="false">
+              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15L6 16Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 20.5a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+              <span>인천 → 도쿄 알림 받기</span>
+            </button>
+          </div>
+        </div>
+
+        <figure class="chart" style="margin:0" aria-labelledby="chartCap">
+          <div class="chart-head">
+            <div>
+              <div class="chart-route" id="chartCap">인천 → 도쿄 나리타 · 왕복</div>
+              <div class="chart-sub">10월 13일 ~ 26일 출발 · 성인 1명 기준</div>
+            </div>
+            <div class="chart-low">
+              <small>이 기간 최저가</small>
+              <strong class="num">172,000원</strong>
+            </div>
+          </div>
+          <div class="bars" id="bars" style="--target:36%"></div>
+          <div class="bar-days num" id="barDays" aria-hidden="true"></div>
+          <div class="chart-legend">
+            <span><i></i>최저가 날짜</span>
+            <span><i class="line"></i>목표 금액 190,000원</span>
+          </div>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 혜택 -->
+  <section class="section" id="benefits" aria-labelledby="benefitTitle">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">회원 혜택</p>
+          <h2 class="section-title" id="benefitTitle">예약할수록 가벼워지는 여행</h2>
+        </div>
+        <a class="link-more" href="#">혜택 자세히 보기 <svg width="16" height="16" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </div>
+      <div class="benefit-grid">
+        <article class="benefit">
+          <div class="benefit-num num">1만<span>원</span></div>
+          <h3>첫 항공권 예약 할인</h3>
+          <p>회원가입 후 첫 예약이라면 국제선 20만 원 이상 결제 시 바로 할인돼요.</p>
+          <p class="fine">가입일로부터 30일 이내 사용</p>
+        </article>
+        <article class="benefit">
+          <div class="benefit-num num">2<span>%</span></div>
+          <h3>구름 포인트 적립</h3>
+          <p>결제 금액의 2%를 포인트로 돌려드려요. 다음 항공권이나 좌석 지정에 현금처럼 쓸 수 있어요.</p>
+          <p class="fine">탑승 완료 후 7일 이내 적립</p>
+        </article>
+        <article class="benefit">
+          <div class="benefit-num num">6<span>개월</span></div>
+          <h3>카드사 무이자 할부</h3>
+          <p>주요 카드사 최대 6개월 무이자 할부와 간편결제 즉시 할인을 함께 받을 수 있어요.</p>
+          <p class="fine">카드사별 조건은 결제 화면에서 확인</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 신뢰 -->
+  <section class="section" aria-labelledby="trustTitle">
+    <div class="container">
+      <div class="trust">
+        <div>
+          <p class="section-kicker">믿고 떠나는 이유</p>
+          <h2 class="section-title" id="trustTitle">여행자 320만 명이<br>구름다리를 건넜어요</h2>
+          <div class="stats">
+            <div class="stat"><strong class="num">120+</strong><span>제휴 항공사</span></div>
+            <div class="stat"><strong class="num">4.8</strong><span>앱 평점 (리뷰 3.2만 건)</span></div>
+            <div class="stat"><strong class="num">3분</strong><span>평균 상담 연결 시간</span></div>
+            <div class="stat"><strong class="num">0원</strong><span>예약 대행 수수료</span></div>
+          </div>
+        </div>
+        <div class="reviews">
+          <article class="review">
+            <div class="stars" aria-label="별점 5점 만점에 5점">
+              <svg width="16" height="16" aria-hidden="true"><use href="#i-star"/></svg><svg width="16" height="16" aria-hidden="true"><use href="#i-star"/></svg><svg width="16" height="16" aria-hidden="true"><use href="#i-star"/></svg><svg width="16" height="16" aria-hidden="true"><use href="#i-star"/></svg><svg width="16" height="16" aria-hidden="true"><use href="#i-star"/></svg>
+            </div>
+            <blockquote>태풍으로 결항됐을 때 새벽 2시에도 상담원이 바로 대체편을 잡아줬어요. 가격만 보고 골랐는데 이제는 이 대응 때문에 계속 써요.</blockquote>
+            <div class="review-by"><span class="avatar">김</span><div><strong>김○○ 님</strong><span>인천 → 오키나와 · 가족 4명</span></div></div>
+          </article>
+          <article class="review">
+            <div class="stars" aria-label="별점 5점 만점에 5점">
+              <svg width="16" height="16" aria-hidden="true"><use href="#i-star"/></svg><svg width="16" height="16" aria-hidden="true"><use href="#i-star"/></svg><svg width="16" height="16" aria-hidden="true"><use href="#i-star"/></svg><svg width="16" height="16" aria-hidden="true"><use href="#i-star"/></svg><svg width="16" height="16" aria-hidden="true"><use href="#i-star"/></svg>
+            </div>
+            <blockquote>결제 직전에 금액이 올라가는 일이 없어서 좋아요.</blockquote>
+            <div class="review-by"><span class="avatar">이</span><div><strong>이○○ 님</strong><span>김포 → 제주</span></div></div>
+          </article>
+          <article class="review">
+            <div class="stars" aria-label="별점 5점 만점에 4점">
+              <svg width="16" height="16" aria-hidden="true"><use href="#i-star"/></svg><svg width="16" height="16" aria-hidden="true"><use href="#i-star"/></svg><svg width="16" height="16" aria-hidden="true"><use href="#i-star"/></svg><svg width="16" height="16" aria-hidden="true"><use href="#i-star"/></svg><svg width="16" height="16" aria-hidden="true" style="opacity:.25"><use href="#i-star"/></svg>
+            </div>
+            <blockquote>가격 알림 덕분에 다낭 왕복을 20만 원대에 샀어요.</blockquote>
+            <div class="review-by"><span class="avatar">박</span><div><strong>박○○ 님</strong><span>인천 → 다낭</span></div></div>
+          </article>
+        </div>
+      </div>
+
+      <div class="partners">
+        <p>함께하는 항공사</p>
+        <ul>
+          <li>대한항공</li><li>아시아나항공</li><li>제주항공</li><li>진에어</li><li>티웨이항공</li><li>에어부산</li><li>에어프레미아</li><li>외 110여 곳</li>
+        </ul>
+      </div>
+
+      <div class="app-band">
+        <div style="position:relative;z-index:1">
+          <h2>앱에서는 탑승권까지 한 곳에</h2>
+          <p>예약 확인, 모바일 체크인, 게이트 변경 알림까지. 공항에서 헤매지 않도록 구름다리 앱이 챙길게요.</p>
+        </div>
+        <div class="btns">
+          <a class="store-btn" href="#">
+            <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.4 12.6c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9s-1.8-.8-3-.8C6.9 7.4 5.5 8.3 4.7 9.7c-1.6 2.8-.4 6.9 1.1 9.2.8 1.1 1.7 2.3 2.8 2.3 1.1 0 1.6-.7 3-.7s1.8.7 3 .7 2-1.1 2.7-2.2c.9-1.3 1.2-2.5 1.2-2.6 0 0-2.1-.8-2.1-3.8ZM14.2 5.8c.6-.8 1-1.8.9-2.8-.9 0-2 .6-2.6 1.4-.6.7-1.1 1.7-.9 2.7 1 .1 2-.5 2.6-1.3Z"/></svg>
+            <span><small>다운로드</small><b>App Store</b></span>
+          </a>
+          <a class="store-btn" href="#">
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 2.8v18.4c0 .4.4.6.7.4l10.5-9.6L4.7 2.4c-.3-.2-.7 0-.7.4Zm12.6 8.1L7 3.5l10.9 6.2-1.3 1.2Zm0 2.2 1.3 1.2L7 20.5l9.6-7.4Zm3.6-2.5-1.9-1.1-1.5 1.5 1.5 1.5 1.9-1.1c.7-.4.7-.4 0-.8Z"/></svg>
+            <span><small>다운로드</small><b>Google Play</b></span>
+          </a>
+        </div>
+        <svg class="app-band-art" viewBox="0 0 200 200" aria-hidden="true"><path d="M10 170C50 60 150 60 190 170" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/><path d="M55 170v-45M100 170v-65M145 170v-45" stroke="currentColor" stroke-width="7" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer" id="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-cs">
+        <a class="brand" href="#top" aria-label="구름다리 홈">
+          <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+            <rect width="32" height="32" rx="9" fill="#0F6B5C"/>
+            <path d="M6 22c2.8-7.2 7-10.8 10-10.8S23.2 14.8 26 22" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M11 22v-4.2M16 22v-5.8M21 22v-4.2" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>
+            <circle cx="23.5" cy="9" r="2.2" fill="#fff" opacity=".9"/>
+          </svg>
+          구름다리
+        </a>
+        <strong class="num">1588-0000</strong>
+        <p>고객센터 연중무휴 24시간<br>항공권 변경·환불 상담 오전 9시 ~ 오후 6시</p>
+      </div>
+      <div class="footer-col">
+        <h3>항공권</h3>
+        <ul><li><a href="#">국제선 항공권</a></li><li><a href="#">국내선 항공권</a></li><li><a href="#deals">이번 주 특가</a></li><li><a href="#alert">가격 알림</a></li></ul>
+      </div>
+      <div class="footer-col">
+        <h3>고객 지원</h3>
+        <ul><li><a href="#">예약 조회·변경</a></li><li><a href="#">취소·환불 안내</a></li><li><a href="#">수하물 규정</a></li><li><a href="#">자주 묻는 질문</a></li></ul>
+      </div>
+      <div class="footer-col">
+        <h3>구름다리</h3>
+        <ul><li><a href="#">회사 소개</a></li><li><a href="#">제휴 문의</a></li><li><a href="#">공지사항</a></li><li><a href="#">채용</a></li></ul>
+      </div>
+    </div>
+
+    <div class="footer-legal">
+      <div class="legal-links">
+        <a href="#">이용약관</a>
+        <a href="#" class="strong">개인정보처리방침</a>
+        <a href="#">여행자 약관</a>
+        <a href="#">위치기반서비스 이용약관</a>
+      </div>
+      <p class="company">
+        <span>(주)구름다리</span><span>대표이사 홍길동</span><span>사업자등록번호 000-00-00000</span><span>통신판매업신고 제2026-서울중구-0000호</span><span>관광사업자 등록번호 제2026-000000호</span><span>서울특별시 중구 세종대로 000, 00층</span>
+      </p>
+      <p class="disclaimer">(주)구름다리는 항공권 통신판매중개자로서 항공 운송 계약의 당사자가 아닙니다. 항공권의 운항, 변경 및 환불과 관련한 의무와 책임은 각 항공사와 판매자에게 있습니다. 표시된 요금은 조회 시점 기준이며 좌석 상황에 따라 달라질 수 있습니다.</p>
+      <p class="copyright">© 2026 Gureumdari Inc. 이 페이지는 가상의 서비스를 위한 디자인 시안입니다.</p>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const TODAY = new Date(2026, 8, 28);
+
+  /* ---------- Header ---------- */
+  const header = $('.site-header');
+  const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 8);
+  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  const menuBtn = $('.menu-toggle'), mobileNav = $('#mobileNav');
+  menuBtn.addEventListener('click', () => {
+    const open = mobileNav.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded', open);
+    menuBtn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
+  });
+  $$('a', mobileNav).forEach(a => a.addEventListener('click', () => { mobileNav.classList.remove('open'); menuBtn.setAttribute('aria-expanded', false); }));
+
+  /* ---------- Toast ---------- */
+  const toast = $('#toast'); let tt;
+  const showToast = (msg) => { toast.textContent = msg; toast.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => toast.classList.remove('show'), 2600); };
+
+  /* ---------- Airports ---------- */
+  const AIRPORTS = [
+    { code:'ICN', city:'서울/인천', name:'인천국제공항', country:'대한민국', group:'국내' },
+    { code:'GMP', city:'서울/김포', name:'김포국제공항', country:'대한민국', group:'국내' },
+    { code:'PUS', city:'부산', name:'김해국제공항', country:'대한민국', group:'국내' },
+    { code:'CJU', city:'제주', name:'제주국제공항', country:'대한민국', group:'국내' },
+    { code:'NRT', city:'도쿄', name:'나리타국제공항', country:'일본', group:'해외' },
+    { code:'HND', city:'도쿄', name:'하네다공항', country:'일본', group:'해외' },
+    { code:'KIX', city:'오사카', name:'간사이국제공항', country:'일본', group:'해외' },
+    { code:'FUK', city:'후쿠오카', name:'후쿠오카공항', country:'일본', group:'해외' },
+    { code:'OKA', city:'오키나와', name:'나하공항', country:'일본', group:'해외' },
+    { code:'TPE', city:'타이베이', name:'타오위안국제공항', country:'대만', group:'해외' },
+    { code:'DAD', city:'다낭', name:'다낭국제공항', country:'베트남', group:'해외' },
+    { code:'BKK', city:'방콕', name:'수완나품국제공항', country:'태국', group:'해외' },
+    { code:'CEB', city:'세부', name:'막탄세부국제공항', country:'필리핀', group:'해외' },
+    { code:'SIN', city:'싱가포르', name:'창이국제공항', country:'싱가포르', group:'해외' },
+    { code:'HKG', city:'홍콩', name:'홍콩국제공항', country:'홍콩', group:'해외' },
+    { code:'GUM', city:'괌', name:'안토니오 B. 원 팻 국제공항', country:'미국', group:'해외' },
+    { code:'LAX', city:'로스앤젤레스', name:'로스앤젤레스국제공항', country:'미국', group:'해외' },
+    { code:'CDG', city:'파리', name:'샤를 드골 공항', country:'프랑스', group:'해외' },
+  ];
+  const byCode = Object.fromEntries(AIRPORTS.map(a => [a.code, a]));
+  const selected = { from: byCode.ICN, to: null };
+
+  const apFields = $$('[data-ap]');
+  function renderList(field, q) {
+    const key = field.dataset.ap, list = $('.popover', field), input = $('input', field);
+    const query = q.trim().toLowerCase();
+    let items = AIRPORTS.filter(a => a !== selected[key === 'from' ? 'to' : 'from']);
+    if (query) items = items.filter(a => (a.city + a.name + a.code + a.country).toLowerCase().includes(query));
+    if (!items.length) { list.innerHTML = `<div class="ap-empty">‘${q}’에 맞는 공항을 찾지 못했어요</div>`; return; }
+    const groups = query ? { '검색 결과': items } : items.reduce((g, a) => ((g[a.group === '국내' ? '국내 공항' : '인기 해외 도시'] ||= []).push(a), g), {});
+    list.innerHTML = Object.entries(groups).map(([g, arr]) =>
+      `<div class="ap-group">${g}</div>` + arr.slice(0, 8).map(a =>
+        `<button type="button" class="ap-item" role="option" data-code="${a.code}"><span class="ap-code">${a.code}</span><span><span class="ap-name">${a.city}</span><br><span class="ap-sub">${a.name} · ${a.country}</span></span></button>`
+      ).join('')).join('');
+    input.setAttribute('aria-expanded', 'true');
+  }
+  function setAirport(field, a) {
+    const key = field.dataset.ap;
+    selected[key] = a;
+    $('input', field).value = a ? a.city : '';
+    $('[data-hint]', field).textContent = a ? `${a.code} · ${a.name}` : (key === 'to' ? '도시나 공항 이름으로 검색' : '');
+    field.classList.remove('is-invalid');
+  }
+  function closeAll(except) {
+    $$('.popover.open').forEach(p => { if (p !== except) { p.classList.remove('open'); const i = p.parentElement.querySelector('[aria-expanded]'); i && i.setAttribute('aria-expanded', 'false'); } });
+  }
+  apFields.forEach(field => {
+    const input = $('input', field), list = $('.popover', field);
+    field.addEventListener('click', (e) => { if (!e.target.closest('.popover, .swap')) input.focus(); });
+    input.addEventListener('focus', () => { closeAll(list); input.select(); renderList(field, ''); list.classList.add('open'); });
+    input.addEventListener('input', () => { renderList(field, input.value); list.classList.add('open'); });
+    input.addEventListener('keydown', (e) => {
+      const opts = $$('.ap-item', list); if (!opts.length) return;
+      let i = opts.findIndex(o => o.classList.contains('active'));
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault(); opts[i]?.classList.remove('active');
+        i = e.key === 'ArrowDown' ? (i + 1) % opts.length : (i - 1 + opts.length) % opts.length;
+        opts[i].classList.add('active'); opts[i].scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'Enter') { e.preventDefault(); (opts[i] || opts[0]).click(); }
+      else if (e.key === 'Escape') { list.classList.remove('open'); }
+    });
+    input.addEventListener('blur', () => setTimeout(() => {
+      if (field.contains(document.activeElement)) return;
+      list.classList.remove('open'); input.setAttribute('aria-expanded', 'false');
+      const key = field.dataset.ap; input.value = selected[key] ? selected[key].city : '';
+    }, 150));
+    list.addEventListener('mousedown', e => e.preventDefault());
+    list.addEventListener('click', (e) => {
+      const b = e.target.closest('.ap-item'); if (!b) return;
+      setAirport(field, byCode[b.dataset.code]); list.classList.remove('open'); input.setAttribute('aria-expanded', 'false');
+      if (field.dataset.ap === 'from') $('#toInput').focus(); else { input.blur(); openDate('departDate'); }
+    });
+  });
+  const swapBtn = $('#swapBtn');
+  swapBtn.addEventListener('click', () => {
+    const [f, t] = apFields; const a = selected.from, b = selected.to;
+    setAirport(f, b); setAirport(t, a);
+    swapBtn.classList.toggle('spin');
+  });
+
+  /* ---------- Dates ---------- */
+  const DOW = ['일','월','화','수','목','금','토'];
+  const parse = v => { const [y, m, d] = v.split('-').map(Number); return new Date(y, m - 1, d); };
+  const fmt = d => `${d.getMonth() + 1}월 ${d.getDate()}일 (${DOW[d.getDay()]})`;
+  const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const dayDiff = (a, b) => Math.round((b - a) / 864e5);
+  const dep = $('#departDate'), ret = $('#returnDate');
+  let trip = 'round', stay = 4;
+  function syncDates() {
+    const d = parse(dep.value);
+    $('#departText').textContent = fmt(d);
+    const until = dayDiff(TODAY, d);
+    $('#departHint').textContent = until === 0 ? '오늘 출발' : `출발 ${until}일 전`;
+    ret.min = dep.value;
+    if (parse(ret.value) < d) { const r2 = new Date(d); r2.setDate(r2.getDate() + stay); ret.value = iso(r2); }
+    stay = Math.max(0, dayDiff(d, parse(ret.value)));
+    const r = parse(ret.value);
+    if (trip === 'oneway') {
+      $('#returnText').textContent = '편도 여정';
+      $('#returnHint').textContent = '눌러서 왕복으로 변경';
+    } else {
+      $('#returnText').textContent = fmt(r);
+      const n = dayDiff(d, r);
+      $('#returnHint').textContent = n === 0 ? '당일 왕복' : `${n}박 ${n + 1}일`;
+    }
+  }
+  function openDate(id) {
+    const el = $('#' + id);
+    try { el.showPicker(); } catch (_) { el.focus(); }
+  }
+  [dep, ret].forEach(el => {
+    el.addEventListener('change', syncDates);
+    el.addEventListener('click', (e) => { try { el.showPicker(); e.preventDefault(); } catch (_) {} });
+  });
+  $('#returnField').addEventListener('click', (e) => {
+    if (trip === 'oneway') { e.preventDefault(); setTrip('round'); }
+  });
+
+  /* ---------- Trip type ---------- */
+  const tripBtns = $$('[data-trip]');
+  function setTrip(t) {
+    if (t === 'multi') { showToast('다구간 검색은 곧 열릴 예정이에요'); return; }
+    trip = t;
+    tripBtns.forEach(b => b.setAttribute('aria-checked', b.dataset.trip === t));
+    const rf = $('#returnField');
+    rf.classList.toggle('is-disabled', t === 'oneway');
+    ret.disabled = t === 'oneway';
+    rf.style.cursor = t === 'oneway' ? 'pointer' : '';
+    syncDates();
+  }
+  tripBtns.forEach(b => b.addEventListener('click', () => setTrip(b.dataset.trip)));
+  // keyboard arrows in radiogroup
+  $('.trip-tabs').addEventListener('keydown', (e) => {
+    if (!['ArrowLeft','ArrowRight'].includes(e.key)) return;
+    const i = tripBtns.indexOf(document.activeElement); if (i < 0) return;
+    const n = tripBtns[(i + (e.key === 'ArrowRight' ? 1 : -1) + 2) % 2];
+    n.focus(); setTrip(n.dataset.trip);
+  });
+
+  /* ---------- Passengers ---------- */
+  const pax = { adult: 1, child: 0, infant: 0 };
+  const paxBtn = $('#paxBtn'), paxPop = $('#paxPop');
+  function syncPax() {
+    $$('.stepper').forEach(s => {
+      const t = s.dataset.type, v = pax[t];
+      $('output', s).textContent = v;
+      const [minus, plus] = $$('button', s);
+      const total = pax.adult + pax.child;
+      minus.disabled = t === 'adult' ? v <= 1 || pax.infant >= v : v <= 0;
+      plus.disabled = t === 'infant' ? v >= pax.adult : total >= 9;
+    });
+    const parts = [`성인 ${pax.adult}명`];
+    if (pax.child) parts.push(`소아 ${pax.child}명`);
+    if (pax.infant) parts.push(`유아 ${pax.infant}명`);
+    const total = pax.adult + pax.child + pax.infant;
+    $('#paxText').textContent = parts.length > 1 ? `승객 ${total}명` : parts[0];
+    $('#paxText').title = parts.join(', ');
+    $('#cabinText').textContent = (parts.length > 1 ? parts.join(' · ') + ' · ' : '') + $('input[name="cabin"]:checked').value;
+  }
+  $$('.stepper').forEach(s => s.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b || b.disabled) return;
+    pax[s.dataset.type] += Number(b.dataset.step); syncPax();
+  }));
+  $$('input[name="cabin"]').forEach(r => r.addEventListener('change', syncPax));
+  const togglePax = (open) => {
+    closeAll(paxPop);
+    paxPop.classList.toggle('open', open); paxBtn.setAttribute('aria-expanded', open);
+  };
+  paxBtn.addEventListener('click', () => togglePax(!paxPop.classList.contains('open')));
+  $('#paxDone').addEventListener('click', () => { togglePax(false); paxBtn.focus(); });
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.field-pax')) { paxPop.classList.remove('open'); paxBtn.setAttribute('aria-expanded', 'false'); }
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && paxPop.classList.contains('open')) { togglePax(false); paxBtn.focus(); } });
+
+  /* ---------- Submit ---------- */
+  $('#searchForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const toField = apFields[1];
+    if (!selected.from) { apFields[0].classList.add('is-invalid'); $('#fromInput').focus(); return; }
+    if (!selected.to) { toField.classList.add('is-invalid'); $('#toInput').focus(); return; }
+    const total = pax.adult + pax.child + pax.infant;
+    const dates = trip === 'round' ? `${fmt(parse(dep.value))} ~ ${fmt(parse(ret.value))}` : `${fmt(parse(dep.value))} 편도`;
+    showToast(`${selected.from.city} → ${selected.to.city}, ${dates}, ${total}명 검색 중이에요`);
+  });
+
+  /* Quick chips (recent searches) */
+  $$('[data-quick]').forEach(c => c.addEventListener('click', () => {
+    const code = c.dataset.quick;
+    setAirport(apFields[0], code === 'CJU' ? byCode.GMP : byCode.ICN);
+    setAirport(apFields[1], byCode[code]);
+    const map = { FUK: ['2026-11-02','2026-11-05'], DAD: ['2026-12-20','2026-12-25'], CJU: ['2026-10-09','2026-10-11'] };
+    dep.value = map[code][0]; ret.value = map[code][1]; setTrip('round');
+  }));
+
+  /* ---------- Deals ---------- */
+  const DEALS = [
+    { r:'jp', from:'ICN', to:'NRT', fromCity:'인천', city:'도쿄', title:'도쿄 나리타', dates:'10.22 – 10.26', air:'제주항공', direct:true, price:189000, was:274000 },
+    { r:'jp', from:'ICN', to:'KIX', fromCity:'인천', city:'오사카', title:'오사카 간사이', dates:'11.05 – 11.08', air:'티웨이항공', direct:true, price:156000, was:219000 },
+    { r:'jp', from:'ICN', to:'FUK', fromCity:'인천', city:'후쿠오카', title:'후쿠오카', dates:'10.30 – 11.02', air:'진에어', direct:true, price:129000, was:188000 },
+    { r:'sea', from:'ICN', to:'DAD', fromCity:'인천', city:'다낭', title:'다낭', dates:'11.12 – 11.17', air:'비엣젯항공', direct:true, price:248000, was:352000 },
+    { r:'sea', from:'ICN', to:'BKK', fromCity:'인천', city:'방콕', title:'방콕 수완나품', dates:'11.20 – 11.25', air:'타이항공', direct:true, price:312000, was:420000 },
+    { r:'cn', from:'ICN', to:'TPE', fromCity:'인천', city:'타이베이', title:'타이베이 타오위안', dates:'10.24 – 10.27', air:'에바항공', direct:true, price:198000, was:265000 },
+    { r:'kr', from:'GMP', to:'CJU', fromCity:'김포', city:'제주', title:'제주', dates:'10.17 – 10.19', air:'대한항공', direct:true, price:58000, was:92000 },
+    { r:'sea', from:'ICN', to:'CEB', fromCity:'인천', city:'세부', title:'세부 막탄', dates:'12.03 – 12.08', air:'필리핀항공', direct:false, price:276000, was:366000 },
+  ];
+  const won = n => n.toLocaleString('ko-KR');
+  $('#dealGrid').innerHTML = DEALS.map(d => {
+    const off = Math.round((1 - d.price / d.was) * 100);
+    return `<a class="deal" href="#" data-region="${d.r}" aria-label="${d.fromCity}에서 ${d.title} 왕복 ${won(d.price)}원부터, ${d.dates}, ${d.air}">
+      <div class="deal-board">
+        <div class="deal-route"><span class="from">${d.from}</span><svg aria-hidden="true"><use href="#i-dash"/></svg><span>${d.to}</span></div>
+        <div class="deal-cities"><span>${d.fromCity}</span><span>${d.city}</span></div>
+      </div>
+      <div class="deal-body">
+        <div class="deal-head"><h3 class="deal-title">${d.title}</h3><span class="deal-badge num">-${off}%</span></div>
+        <div class="deal-meta num"><span>${d.dates}</span><span>${d.air}</span><span>${d.direct ? '직항' : '경유 1회'}</span></div>
+        <div class="deal-price"><small>왕복 · 1인</small><div><s class="num">${won(d.was)}원</s><strong class="num">${won(d.price)}<span>원~</span></strong></div></div>
+      </div>
+    </a>`;
+  }).join('');
+  const filterBtns = $$('[data-filter]');
+  filterBtns.forEach(b => b.addEventListener('click', () => {
+    filterBtns.forEach(x => x.setAttribute('aria-pressed', x === b));
+    const f = b.dataset.filter;
+    $$('.deal').forEach(c => c.hidden = f !== 'all' && c.dataset.region !== f);
+  }));
+  $('#dealGrid').addEventListener('click', (e) => {
+    const c = e.target.closest('.deal'); if (!c) return; e.preventDefault();
+    const d = DEALS[$$('.deal').indexOf(c)];
+    setAirport(apFields[0], byCode[d.from]); setAirport(apFields[1], byCode[d.to]);
+    const [s, en] = d.dates.split(' – ').map(x => x.split('.').map(Number));
+    dep.value = iso(new Date(2026, s[0] - 1, s[1])); ret.value = iso(new Date(2026, en[0] - 1, en[1])); setTrip('round');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    showToast(`${d.title} 특가 일정을 검색창에 담았어요`);
+  });
+
+  /* ---------- Price chart ---------- */
+  const prices = [214,198,226,241,205,186,172,193,208,229,252,236,201,219]; // 천 원
+  const max = 270, min = 120;
+  const h = p => `${Math.round(((p - min) / (max - min)) * 100)}%`;
+  const lowest = Math.min(...prices);
+  $('#bars').style.setProperty('--target', h(190));
+  $('#bars').innerHTML = prices.map((p, i) => {
+    const d = new Date(2026, 9, 13 + i);
+    return `<div class="bar${p === lowest ? ' low' : ''}" style="--h:${h(p)}" role="img" aria-label="${fmt(d)} ${won(p * 1000)}원"><span class="tip num">${p === lowest ? '최저 ' : ''}${p}k</span><i></i></div>`;
+  }).join('');
+  $('#barDays').innerHTML = prices.map((_, i) => {
+    const d = new Date(2026, 9, 13 + i), we = d.getDay() === 0 || d.getDay() === 6;
+    return `<span class="${we ? 'we' : ''}">${d.getDate()}</span>`;
+  }).join('');
+  const alertBtn = $('#alertBtn');
+  alertBtn.addEventListener('click', () => {
+    const on = alertBtn.getAttribute('aria-pressed') !== 'true';
+    alertBtn.setAttribute('aria-pressed', on);
+    $('span', alertBtn).textContent = on ? '알림 설정 완료 · 190,000원 이하' : '인천 → 도쿄 알림 받기';
+    showToast(on ? '190,000원 이하로 내려가면 알려드릴게요' : '가격 알림을 해제했어요');
+  });
+
+  syncDates(); syncPax();
+})();
+</script>
+</body>
+</html>
