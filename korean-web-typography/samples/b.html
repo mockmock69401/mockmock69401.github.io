@@ -1,0 +1,858 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>구름다리 | 항공권 검색과 예약</title>
+<meta name="description" content="구름다리에서 국내선·국제선 항공권을 한 번에 비교하고 예약하세요." />
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css" />
+<style>
+  :root {
+    --font-sans: Pretendard, system-ui, sans-serif;
+
+    --accent: #0F6B5C;
+    --accent-strong: #0A5247;
+    --accent-soft: #E3F1EE;
+    --accent-tint: #F2F8F6;
+    --on-accent: #FFFFFF;
+
+    --bg: #FAFAF7;
+    --surface: #FFFFFF;
+    --surface-2: #F3F3EE;
+    --line: #E4E4DD;
+    --line-strong: #CFCFC6;
+    --text: #1A1D1C;
+    --text-2: #4A504E;
+    --text-3: #6A706D;
+    --sale: #B4442C;
+
+    --radius-lg: 20px;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --shadow: 0 1px 2px rgba(20, 30, 28, .05), 0 12px 32px -12px rgba(20, 40, 36, .16);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --accent: #4FB8A4;
+      --accent-strong: #7ACDBC;
+      --accent-soft: #15332E;
+      --accent-tint: #122522;
+      --on-accent: #06201B;
+
+      --bg: #0F1211;
+      --surface: #171B1A;
+      --surface-2: #1E2322;
+      --line: #2A302E;
+      --line-strong: #3A413F;
+      --text: #ECEFEE;
+      --text-2: #B7BDBA;
+      --text-3: #939A97;
+      --sale: #F08A70;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 40px -16px rgba(0,0,0,.6);
+      color-scheme: dark;
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  :root, body { word-break: keep-all; overflow-wrap: anywhere; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  code, kbd, samp, pre { font-family: inherit; }
+  img, svg { display: block; }
+  a { color: inherit; text-decoration: none; }
+  button, input, select { font: inherit; color: inherit; letter-spacing: inherit; }
+  button { cursor: pointer; }
+  p { text-wrap: pretty; margin: 0; }
+
+  h1, h2, h3, h4 {
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  .wrap { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  .num { font-variant-numeric: tabular-nums; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+
+  /* ---------- 헤더 ---------- */
+  .site-header {
+    position: sticky; top: 0; z-index: 20;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: saturate(1.4) blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .site-header .wrap { display: flex; align-items: center; gap: 32px; height: 68px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; letter-spacing: -0.03em; color: var(--text); }
+  .logo-mark { width: 32px; height: 32px; color: var(--accent); }
+  .nav { display: flex; gap: 4px; }
+  .nav a { padding: 8px 12px; border-radius: 8px; font-size: 15px; font-weight: 500; color: var(--text-2); }
+  .nav a:hover { background: var(--surface-2); color: var(--text); }
+  .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .btn-ghost { background: none; border: 1px solid var(--line-strong); border-radius: 999px; padding: 8px 16px; font-size: 15px; font-weight: 600; color: var(--text); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-text { background: none; border: 0; padding: 8px 10px; font-size: 15px; font-weight: 500; color: var(--text-2); }
+  .menu-btn { display: none; background: none; border: 0; width: 44px; height: 44px; border-radius: 10px; align-items: center; justify-content: center; margin-left: auto; color: var(--text); }
+
+  /* ---------- 히어로 ---------- */
+  .hero { position: relative; padding: 56px 0 40px; overflow: hidden; }
+  .hero-bg { position: absolute; inset: 0; pointer-events: none; color: var(--accent); opacity: .9; }
+  .hero-bg svg { position: absolute; right: -40px; top: 12px; width: 720px; max-width: none; height: auto; }
+  .hero-top { position: relative; max-width: 640px; margin-bottom: 36px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; margin-bottom: 20px; }
+  .eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .hero h1 { font-size: 52px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.29; }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero-lead { margin-top: 16px; font-size: 18px; line-height: 1.6; color: var(--text-2); max-width: 520px; }
+
+  /* ---------- 검색 모듈 ---------- */
+  .search {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 20px 20px 22px;
+  }
+  .search-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+  .trip-toggle { display: inline-flex; background: var(--surface-2); border-radius: 999px; padding: 4px; }
+  .trip-toggle button { border: 0; background: none; padding: 8px 18px; border-radius: 999px; font-size: 15px; font-weight: 600; color: var(--text-2); }
+  .trip-toggle button[aria-pressed="true"] { background: var(--surface); color: var(--accent); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .search-opts { display: flex; flex-wrap: wrap; gap: 16px; font-size: 15px; color: var(--text-2); }
+  .check { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+  .check input { width: 18px; height: 18px; accent-color: var(--accent); margin: 0; }
+
+  .fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr) auto;
+    gap: 8px;
+    align-items: stretch;
+  }
+  .route { grid-column: 1 / 3; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; position: relative; }
+  .field {
+    position: relative;
+    display: flex; flex-direction: column; justify-content: center;
+    min-height: 72px;
+    padding: 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    text-align: left;
+    transition: border-color .15s, background .15s;
+  }
+  .field:hover { border-color: var(--line-strong); }
+  .field:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .field-label { font-size: 14px; font-weight: 500; color: var(--text-3); line-height: 1.4; }
+  .field-value { font-size: 18px; font-weight: 700; line-height: 1.35; letter-spacing: -0.02em; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .field-value .code { color: var(--text-3); font-weight: 600; margin-left: 6px; font-size: 15px; }
+  .field-input {
+    border: 0; background: none; outline: none; padding: 0; width: 100%;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.35;
+  }
+  .field-input::placeholder { color: var(--text-3); font-weight: 500; }
+  .field.is-disabled { background: var(--surface-2); }
+  .field.is-disabled .field-value { color: var(--text-3); font-weight: 500; }
+  button.field { font: inherit; cursor: pointer; }
+  .date-native { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+
+  .swap {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 1px solid var(--line-strong); background: var(--surface);
+    display: flex; align-items: center; justify-content: center; color: var(--accent);
+    z-index: 2; transition: transform .25s;
+  }
+  .swap:hover { border-color: var(--accent); }
+  .swap.spin { transform: translate(-50%, -50%) rotate(180deg); }
+
+  .btn-search {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 72px; padding: 0 28px;
+    border: 0; border-radius: var(--radius);
+    background: var(--accent); color: var(--on-accent);
+    font-size: 18px; font-weight: 700; letter-spacing: -0.02em;
+    white-space: nowrap;
+    transition: background .15s;
+  }
+  .btn-search:hover { background: var(--accent-strong); }
+
+  /* 승객 팝오버 */
+  .pax { position: relative; }
+  .pax > button { width: 100%; height: 100%; }
+  .popover {
+    position: absolute; top: calc(100% + 8px); right: 0; z-index: 10;
+    width: 340px; max-width: calc(100vw - 32px);
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 20px;
+  }
+  .popover[hidden] { display: none; }
+  .pop-title { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 12px; }
+  .pax-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .pax-row:last-of-type { border-bottom: 0; }
+  .pax-row b { display: block; font-size: 16px; font-weight: 600; }
+  .pax-row small { display: block; font-size: 14px; color: var(--text-3); }
+  .stepper { display: flex; align-items: center; gap: 12px; }
+  .stepper button { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-strong); background: var(--surface); font-size: 18px; line-height: 1; display: flex; align-items: center; justify-content: center; color: var(--accent); }
+  .stepper button:disabled { color: var(--line-strong); cursor: not-allowed; }
+  .stepper output { min-width: 20px; text-align: center; font-weight: 700; font-size: 16px; }
+  .cabins { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px; }
+  .cabins label { position: relative; }
+  .cabins input { position: absolute; opacity: 0; }
+  .cabins span { display: block; text-align: center; padding: 10px 8px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; color: var(--text-2); cursor: pointer; }
+  .cabins input:checked + span { border-color: var(--accent); color: var(--accent); background: var(--accent-tint); }
+  .cabins input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .pop-done { margin-top: 16px; width: 100%; border: 0; border-radius: var(--radius-sm); background: var(--accent); color: var(--on-accent); font-weight: 700; padding: 12px; font-size: 16px; }
+
+  .recent { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 16px; font-size: 14px; color: var(--text-3); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 12px; font-size: 14px; font-weight: 500; color: var(--text-2); }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ---------- 섹션 공통 ---------- */
+  section { padding: 72px 0; }
+  .sec-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 28px; }
+  .sec-head h2 { font-size: 32px; }
+  .sec-head p { margin-top: 8px; color: var(--text-2); font-size: 16px; }
+  .link-more { display: inline-flex; align-items: center; gap: 4px; font-size: 15px; font-weight: 600; color: var(--accent); }
+
+  /* ---------- 특가 노선 ---------- */
+  .filters { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .filters::-webkit-scrollbar { display: none; }
+  .filters button { flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 16px; font-size: 15px; font-weight: 600; color: var(--text-2); }
+  .filters button[aria-pressed="true"] { background: var(--text); border-color: var(--text); color: var(--bg); }
+
+  .deals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .deal {
+    display: flex; flex-direction: column;
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
+    overflow: hidden; transition: transform .2s, box-shadow .2s, border-color .2s;
+  }
+  .deal:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: transparent; }
+  .deal-art { position: relative; aspect-ratio: 16 / 10; color: var(--on-accent); }
+  .deal-art svg { width: 100%; height: 100%; }
+  .deal-tag { position: absolute; left: 12px; top: 12px; background: var(--surface); color: var(--sale); font-size: 14px; font-weight: 700; border-radius: 999px; padding: 4px 10px; line-height: 1.4; }
+  .deal-body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .deal-route { font-size: 14px; color: var(--text-3); font-weight: 500; }
+  .deal h3 { font-size: 20px; }
+  .deal-meta { font-size: 14px; color: var(--text-3); }
+  .deal-price { margin-top: auto; padding-top: 12px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; }
+  .deal-price strong { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: var(--text); }
+  .deal-price s { font-size: 14px; color: var(--text-3); }
+  .deal-price .from { font-size: 14px; color: var(--text-2); }
+
+  /* ---------- 최저가 달력 ---------- */
+  .fare-cal { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 24px; }
+  .fare-cal-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .fare-cal-head h3 { font-size: 20px; }
+  .fare-cal-head p { font-size: 15px; color: var(--text-2); margin-top: 4px; }
+  .legend { display: flex; gap: 16px; font-size: 14px; color: var(--text-2); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: 0; }
+  .bars { display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 8px; align-items: end; height: 220px; }
+  .bar { display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; border: 0; background: none; padding: 0; }
+  .bar-fill { width: 100%; max-width: 44px; border-radius: 8px 8px 4px 4px; background: var(--accent-soft); transition: background .15s; }
+  .bar.low .bar-fill { background: var(--accent); }
+  .bar:hover .bar-fill { background: var(--accent-strong); }
+  .bar-price { font-size: 14px; font-weight: 600; color: var(--text-2); line-height: 1.3; }
+  .bar.low .bar-price { color: var(--accent); }
+  .bar-day { font-size: 14px; color: var(--text-3); line-height: 1.3; }
+  .bar-day.sun { color: var(--sale); }
+
+  /* ---------- 혜택 ---------- */
+  .benefits { background: var(--accent-tint); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .benefit-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .benefit { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 28px 24px; }
+  .benefit-icon { width: 48px; height: 48px; border-radius: 14px; background: var(--accent-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+  .benefit h3 { font-size: 20px; margin-bottom: 8px; }
+  .benefit p { color: var(--text-2); font-size: 16px; }
+
+  /* ---------- 신뢰 ---------- */
+  .trust-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: center; }
+  .trust-grid h2 { font-size: 32px; line-height: 1.31; }
+  .trust-grid > div > p { margin-top: 16px; color: var(--text-2); font-size: 17px; line-height: 1.7; max-width: 480px; }
+  .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .stat { border-top: 2px solid var(--accent); padding-top: 16px; }
+  .stat strong { display: block; font-size: 36px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; }
+  .stat span { display: block; margin-top: 6px; font-size: 15px; color: var(--text-2); }
+  .airlines { margin-top: 48px; display: flex; flex-wrap: wrap; gap: 10px; }
+  .airlines span { font-size: 15px; font-weight: 600; color: var(--text-3); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 10px 16px; background: var(--surface); }
+
+  .review-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 48px; }
+  .review { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 24px; }
+  .review .stars { display: flex; gap: 2px; color: var(--accent); margin-bottom: 12px; }
+  .review p { font-size: 16px; line-height: 1.7; color: var(--text); }
+  .review footer { margin-top: 16px; font-size: 14px; color: var(--text-3); }
+
+  /* ---------- 앱 배너 ---------- */
+  .app-cta { padding-top: 0; }
+  .app-card {
+    display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 32px;
+    background: var(--accent); color: var(--on-accent);
+    border-radius: 24px; padding: 40px 48px; position: relative; overflow: hidden;
+  }
+  .app-card h2 { font-size: 28px; line-height: 1.15; }
+  .app-card p { margin-top: 8px; font-size: 16px; opacity: .88; }
+  .app-card .btns { display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+  .app-card a { display: inline-flex; align-items: center; gap: 8px; background: var(--on-accent); color: var(--accent); border-radius: 12px; padding: 12px 18px; font-weight: 700; font-size: 15px; }
+  .app-card .arc { position: absolute; right: -60px; bottom: -120px; width: 420px; opacity: .18; color: var(--on-accent); pointer-events: none; }
+
+  /* ---------- 푸터 ---------- */
+  .site-footer { border-top: 1px solid var(--line); padding: 56px 0 40px; background: var(--surface); }
+  .foot-grid { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 32px; }
+  .foot-grid h4 { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 14px; color: var(--text); }
+  .foot-grid ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .foot-grid a { font-size: 15px; color: var(--text-2); }
+  .foot-grid a:hover { color: var(--accent); }
+  .foot-brand p { margin-top: 12px; font-size: 15px; color: var(--text-2); max-width: 280px; }
+  .cs { margin-top: 20px; }
+  .cs strong { display: block; font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+  .cs span { font-size: 14px; color: var(--text-3); }
+  .legal { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 14px; line-height: 1.7; color: var(--text-3); }
+  .legal p + p { margin-top: 6px; }
+  .legal-links { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 12px; }
+  .legal-links a { font-weight: 600; color: var(--text-2); }
+
+  /* ---------- 반응형 ---------- */
+  @media (max-width: 1080px) {
+    .fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .route { grid-column: 1 / -1; }
+    .pax { grid-column: 1 / -1; }
+    .btn-search { grid-column: 1 / -1; min-height: 60px; }
+    .deals { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .hero-bg svg { width: 560px; right: -120px; }
+  }
+  @media (max-width: 860px) {
+    .nav, .header-actions { display: none; }
+    .menu-btn { display: inline-flex; }
+    .trust-grid { grid-template-columns: 1fr; gap: 32px; }
+    .benefit-grid, .review-row { grid-template-columns: 1fr; }
+    .foot-grid { grid-template-columns: repeat(2, 1fr); }
+    .foot-brand { grid-column: 1 / -1; }
+    .app-card { grid-template-columns: 1fr; padding: 32px; }
+    .bars { grid-template-columns: repeat(7, minmax(0, 1fr)); height: 200px; }
+    .bars .bar:nth-child(n+8) { display: none; }
+  }
+  @media (max-width: 560px) {
+    .wrap { padding: 0 16px; }
+    .site-header .wrap { height: 60px; }
+    .hero { padding: 32px 0 24px; }
+    .hero-bg svg { width: 420px; right: -200px; top: 150px; opacity: .5; }
+    .hero-top { margin-bottom: 24px; }
+    .hero h1 { font-size: 34px; line-height: 1.29; }
+    .hero-lead { font-size: 16px; }
+    .search { padding: 16px; border-radius: 18px; }
+    .search-head { margin-bottom: 12px; }
+    .trip-toggle { width: 100%; }
+    .trip-toggle button { flex: 1; }
+    .route { grid-template-columns: 1fr; }
+    .swap { left: auto; right: 16px; top: 50%; }
+    .swap svg { transform: rotate(90deg); }
+    .field { min-height: 64px; padding: 10px 14px; }
+    .field-value, .field-input { font-size: 17px; }
+    .date-field .field-value { font-size: 16px; }
+    section { padding: 56px 0; }
+    .sec-head h2 { font-size: 26px; }
+    .sec-head { margin-bottom: 20px; }
+    .deals { grid-template-columns: 1fr; }
+    .deal { flex-direction: row; }
+    .deal-art { aspect-ratio: auto; width: 112px; flex: none; }
+    .deal-body { padding: 14px 16px; }
+    .deal h3 { font-size: 18px; }
+    .deal-price { padding-top: 6px; }
+    .deal-price strong { font-size: 20px; }
+    .fare-cal { padding: 18px 12px; }
+    .fare-cal-head { padding: 0 4px; }
+    .bars { gap: 4px; height: 190px; }
+    .bars .bar:nth-child(n+6) { display: none; }
+    .bars { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .trust-grid h2 { font-size: 26px; line-height: 1.31; }
+    #benefit-title { line-height: 1.31; }
+    .stat strong { font-size: 28px; }
+    .airlines { margin-top: 32px; }
+    .app-card { padding: 28px 22px; border-radius: 20px; }
+    .app-card h2 { font-size: 22px; line-height: 1.15; }
+    .foot-grid { gap: 28px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="#" aria-label="구름다리 홈">
+      <svg class="logo-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect width="32" height="32" rx="9" fill="currentColor"/>
+        <path d="M6 21c3.2-7.4 16.8-7.4 20 0" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+        <circle cx="6" cy="21" r="2.2" fill="#fff"/><circle cx="26" cy="21" r="2.2" fill="#fff"/>
+        <path d="M11 11.5a3 3 0 0 1 5.6-1.2 2.4 2.4 0 0 1 3.4 2.2H11.4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      구름다리
+    </a>
+    <nav class="nav" aria-label="주요 메뉴">
+      <a href="#">항공권</a>
+      <a href="#deals">특가</a>
+      <a href="#">항공+숙소</a>
+      <a href="#">예약 조회</a>
+    </nav>
+    <div class="header-actions">
+      <button class="btn-text" type="button">고객센터</button>
+      <button class="btn-ghost" type="button">로그인</button>
+    </div>
+    <button class="menu-btn" type="button" aria-label="메뉴 열기">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <!-- 히어로 + 검색 -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-bg" aria-hidden="true">
+      <svg viewBox="0 0 720 360" fill="none">
+        <path d="M40 300C180 60 540 60 680 300" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 8" stroke-linecap="round" opacity=".55"/>
+        <path d="M120 300C230 130 490 130 600 300" stroke="currentColor" stroke-width="1" opacity=".22"/>
+        <circle cx="40" cy="300" r="6" fill="currentColor" opacity=".7"/>
+        <circle cx="680" cy="300" r="6" fill="currentColor" opacity=".7"/>
+        <g transform="translate(470 112) rotate(28)">
+          <path d="M-14 0h28M0 0l-6-12M0 0l-6 12M10 0l-3-5M10 0l-3 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".85"/>
+        </g>
+        <path d="M250 150a26 26 0 0 1 48-12 20 20 0 0 1 30 18h-76" fill="currentColor" opacity=".07"/>
+        <path d="M520 220a20 20 0 0 1 37-9 15 15 0 0 1 23 14h-58" fill="currentColor" opacity=".07"/>
+      </svg>
+    </div>
+
+    <div class="wrap">
+      <div class="hero-top">
+        <span class="eyebrow">가을 여행 특가 진행 중</span>
+        <h1 id="hero-title">어디든 가볍게,<br /><em>구름다리</em>로 건너가요</h1>
+        <p class="hero-lead">국내외 항공사 120곳의 운임을 한 번에 비교해요. 숨은 수수료 없이 결제 금액 그대로 보여 드려요.</p>
+      </div>
+
+      <form class="search" id="search" aria-label="항공권 검색" onsubmit="event.preventDefault(); searchFlights();">
+        <div class="search-head">
+          <div class="trip-toggle" role="group" aria-label="여정 종류">
+            <button type="button" aria-pressed="true" data-trip="round">왕복</button>
+            <button type="button" aria-pressed="false" data-trip="oneway">편도</button>
+          </div>
+          <div class="search-opts">
+            <label class="check"><input type="checkbox" /> 직항만</label>
+            <label class="check"><input type="checkbox" /> 날짜 앞뒤 3일 포함</label>
+          </div>
+        </div>
+
+        <div class="fields">
+          <div class="route">
+            <label class="field">
+              <span class="field-label">출발지</span>
+              <input class="field-input" id="from" value="서울 (ICN)" autocomplete="off" />
+            </label>
+            <button type="button" class="swap" id="swap" aria-label="출발지와 도착지 바꾸기">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg>
+            </button>
+            <label class="field">
+              <span class="field-label">도착지</span>
+              <input class="field-input" id="to" placeholder="도시나 공항 검색" autocomplete="off" />
+            </label>
+          </div>
+
+          <button type="button" class="field date-field" id="depart-btn" aria-label="가는 날 선택">
+            <span class="field-label">가는 날</span>
+            <span class="field-value num" id="depart-label">10월 17일 (금)</span>
+            <input type="date" class="date-native" id="depart" tabindex="-1" aria-hidden="true" value="2026-10-17" />
+          </button>
+          <button type="button" class="field date-field" id="return-btn" aria-label="오는 날 선택">
+            <span class="field-label">오는 날</span>
+            <span class="field-value num" id="return-label">10월 20일 (월)</span>
+            <input type="date" class="date-native" id="return" tabindex="-1" aria-hidden="true" value="2026-10-20" />
+          </button>
+
+          <div class="pax">
+            <button type="button" class="field" id="pax-btn" aria-haspopup="dialog" aria-expanded="false" aria-controls="pax-pop">
+              <span class="field-label">승객 · 좌석 등급</span>
+              <span class="field-value" id="pax-label">성인 1명, 일반석</span>
+            </button>
+            <div class="popover" id="pax-pop" role="dialog" aria-label="승객과 좌석 등급 선택" hidden>
+              <p class="pop-title">승객</p>
+              <div class="pax-row">
+                <div><b>성인</b><small>만 12세 이상</small></div>
+                <div class="stepper" data-key="adult"><button type="button" aria-label="성인 줄이기">−</button><output>1</output><button type="button" aria-label="성인 늘리기">+</button></div>
+              </div>
+              <div class="pax-row">
+                <div><b>소아</b><small>만 2세~11세</small></div>
+                <div class="stepper" data-key="child"><button type="button" aria-label="소아 줄이기">−</button><output>0</output><button type="button" aria-label="소아 늘리기">+</button></div>
+              </div>
+              <div class="pax-row">
+                <div><b>유아</b><small>만 2세 미만, 좌석 없음</small></div>
+                <div class="stepper" data-key="infant"><button type="button" aria-label="유아 줄이기">−</button><output>0</output><button type="button" aria-label="유아 늘리기">+</button></div>
+              </div>
+              <p class="pop-title" style="margin-top:16px">좌석 등급</p>
+              <div class="cabins">
+                <label><input type="radio" name="cabin" value="일반석" checked /><span>일반석</span></label>
+                <label><input type="radio" name="cabin" value="프리미엄 일반석" /><span>프리미엄 일반석</span></label>
+                <label><input type="radio" name="cabin" value="비즈니스" /><span>비즈니스</span></label>
+                <label><input type="radio" name="cabin" value="일등석" /><span>일등석</span></label>
+              </div>
+              <button type="button" class="pop-done" id="pax-done">적용</button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-search">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            항공권 검색
+          </button>
+        </div>
+
+        <div class="recent">
+          <span>최근 검색</span>
+          <button type="button" class="chip" data-to="오사카 (KIX)">서울 → 오사카</button>
+          <button type="button" class="chip" data-to="다낭 (DAD)">서울 → 다낭</button>
+          <button type="button" class="chip" data-to="제주 (CJU)">서울 → 제주</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- 특가 노선 -->
+  <section id="deals" aria-labelledby="deals-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <h2 id="deals-title">지금 떠나기 좋은 특가</h2>
+          <p>인천 출발 왕복 기준, 오늘 오전 9시에 확인한 최저 운임이에요.</p>
+        </div>
+        <a class="link-more" href="#">특가 전체 보기
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="filters" role="group" aria-label="지역 필터">
+        <button type="button" aria-pressed="true">전체</button>
+        <button type="button" aria-pressed="false">일본</button>
+        <button type="button" aria-pressed="false">동남아</button>
+        <button type="button" aria-pressed="false">국내</button>
+        <button type="button" aria-pressed="false">유럽</button>
+        <button type="button" aria-pressed="false">미주</button>
+      </div>
+
+      <div class="deals">
+        <a class="deal" href="#">
+          <div class="deal-art" aria-hidden="true">
+            <svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice"><rect width="160" height="100" fill="#0F6B5C"/><circle cx="118" cy="30" r="14" fill="#F4D7A8"/><path d="M0 78 40 50l24 18 30-28 66 48v12H0z" fill="#0A5247"/><path d="M0 88c30-8 60-8 90 0s50 6 70 0v12H0z" fill="#0C5D50"/></svg>
+            <span class="deal-tag">32% 할인</span>
+          </div>
+          <div class="deal-body">
+            <span class="deal-route">인천 ↔ 간사이</span>
+            <h3>오사카</h3>
+            <span class="deal-meta">직항 1시간 50분 · 11월 출발</span>
+            <div class="deal-price"><span class="from">왕복</span><strong class="num">148,000원</strong><s class="num">218,000원</s></div>
+          </div>
+        </a>
+        <a class="deal" href="#">
+          <div class="deal-art" aria-hidden="true">
+            <svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice"><rect width="160" height="100" fill="#2F8A78"/><rect y="62" width="160" height="38" fill="#1D6E60"/><path d="M0 66c20-4 40 4 60 0s40-4 60 0 30 2 40 0" stroke="#9FD6C9" stroke-width="2" fill="none"/><path d="M30 62V30M30 30c-10 2-16 8-18 14M30 30c10 0 16 6 18 12M30 30c-4-8-12-10-18-10M30 30c4-8 12-10 18-8" stroke="#0A4A40" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="124" cy="28" r="12" fill="#F7E3B8"/></svg>
+            <span class="deal-tag">오늘만</span>
+          </div>
+          <div class="deal-body">
+            <span class="deal-route">인천 ↔ 다낭</span>
+            <h3>다낭</h3>
+            <span class="deal-meta">직항 4시간 40분 · 12월 출발</span>
+            <div class="deal-price"><span class="from">왕복</span><strong class="num">239,000원</strong><s class="num">312,000원</s></div>
+          </div>
+        </a>
+        <a class="deal" href="#">
+          <div class="deal-art" aria-hidden="true">
+            <svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice"><rect width="160" height="100" fill="#3A9C88"/><path d="M0 72c24-20 52-28 80-24s56 12 80 4v48H0z" fill="#237A69"/><path d="M60 52 80 22l20 30z" fill="#E9F3F0"/><path d="M72 40l8-12 8 12-8-3z" fill="#fff"/><circle cx="130" cy="24" r="10" fill="#F4D7A8"/></svg>
+            <span class="deal-tag">주말 특가</span>
+          </div>
+          <div class="deal-body">
+            <span class="deal-route">김포 ↔ 제주</span>
+            <h3>제주</h3>
+            <span class="deal-meta">직항 1시간 10분 · 10월 출발</span>
+            <div class="deal-price"><span class="from">왕복</span><strong class="num">46,800원</strong><s class="num">89,000원</s></div>
+          </div>
+        </a>
+        <a class="deal" href="#">
+          <div class="deal-art" aria-hidden="true">
+            <svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice"><rect width="160" height="100" fill="#0C5347"/><rect x="36" y="44" width="14" height="46" fill="#1B7566"/><rect x="56" y="30" width="18" height="60" fill="#2A8A79"/><rect x="80" y="50" width="12" height="40" fill="#1B7566"/><rect x="98" y="38" width="16" height="52" fill="#2A8A79"/><rect y="88" width="160" height="12" fill="#083E35"/><circle cx="128" cy="22" r="8" fill="#F7E3B8"/></svg>
+            <span class="deal-tag">신규 취항</span>
+          </div>
+          <div class="deal-body">
+            <span class="deal-route">인천 ↔ 타오위안</span>
+            <h3>타이베이</h3>
+            <span class="deal-meta">직항 2시간 35분 · 11월 출발</span>
+            <div class="deal-price"><span class="from">왕복</span><strong class="num">176,000원</strong><s class="num">241,000원</s></div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 최저가 날짜 -->
+  <section style="padding-top:0" aria-labelledby="cal-title">
+    <div class="wrap">
+      <div class="fare-cal">
+        <div class="fare-cal-head">
+          <div>
+            <h3 id="cal-title">서울 → 오사카, 언제 가면 가장 쌀까요?</h3>
+            <p>10월 13일~26일 출발 편도 최저가예요. 막대를 누르면 그 날짜로 검색해요.</p>
+          </div>
+          <div class="legend"><span><i style="background:var(--accent)"></i>최저가</span><span><i style="background:var(--accent-soft)"></i>일반</span></div>
+        </div>
+        <div class="bars" id="bars"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 혜택 -->
+  <section class="benefits" aria-labelledby="benefit-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <h2 id="benefit-title">구름다리에서 예약하면 달라지는 점</h2>
+        </div>
+      </div>
+      <div class="benefit-grid">
+        <article class="benefit">
+          <div class="benefit-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M17 7H9.5a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H6"/></svg>
+          </div>
+          <h3>처음 본 가격이 결제 가격</h3>
+          <p>유류할증료와 세금, 발권 수수료까지 모두 더한 금액으로 보여 드려요. 결제 단계에서 금액이 늘지 않아요.</p>
+        </article>
+        <article class="benefit">
+          <div class="benefit-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          </div>
+          <h3>가격 알림으로 기다리기</h3>
+          <p>원하는 노선과 목표 금액을 정해 두면, 그 아래로 내려갈 때 카카오톡으로 알려 드려요.</p>
+        </article>
+        <article class="benefit">
+          <div class="benefit-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>
+          </div>
+          <h3>24시간 무료 취소</h3>
+          <p>예약 후 24시간 안에는 대부분의 항공권을 수수료 없이 취소할 수 있어요. 해당 여부는 운임 상세에서 확인해요.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 신뢰 -->
+  <section aria-labelledby="trust-title">
+    <div class="wrap">
+      <div class="trust-grid">
+        <div>
+          <h2 id="trust-title">매달 80만 명이<br />구름다리로 떠나요</h2>
+          <p>항공사와 직접 연결된 실시간 좌석 정보로 예약해요. 결제는 국내 PG사를 거쳐 안전하게 처리되고, 발권 후 문제가 생기면 전담 상담사가 끝까지 도와드려요.</p>
+        </div>
+        <div class="stats">
+          <div class="stat"><strong class="num">120곳</strong><span>제휴 항공사</span></div>
+          <div class="stat"><strong class="num">4.8점</strong><span>앱 평점 (리뷰 3.2만 개)</span></div>
+          <div class="stat"><strong class="num">98.7%</strong><span>당일 발권 완료율</span></div>
+          <div class="stat"><strong>연중무휴</strong><span>한국어 상담</span></div>
+        </div>
+      </div>
+
+      <div class="airlines" aria-label="주요 제휴 항공사">
+        <span>대한항공</span><span>아시아나항공</span><span>제주항공</span><span>진에어</span><span>티웨이항공</span><span>에어부산</span><span>일본항공</span><span>베트남항공</span><span>싱가포르항공</span>
+      </div>
+
+      <div class="review-row">
+        <figure class="review" style="margin:0">
+          <div class="stars" aria-label="별점 5점"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3 6.5 7 .8-5.2 4.8 1.4 7-6.2-3.6L5.8 21l1.4-7L2 9.3l7-.8z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3 6.5 7 .8-5.2 4.8 1.4 7-6.2-3.6L5.8 21l1.4-7L2 9.3l7-.8z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3 6.5 7 .8-5.2 4.8 1.4 7-6.2-3.6L5.8 21l1.4-7L2 9.3l7-.8z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3 6.5 7 .8-5.2 4.8 1.4 7-6.2-3.6L5.8 21l1.4-7L2 9.3l7-.8z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3 6.5 7 .8-5.2 4.8 1.4 7-6.2-3.6L5.8 21l1.4-7L2 9.3l7-.8z"/></svg></div>
+          <blockquote style="margin:0"><p>다른 곳에서는 결제 직전에 수수료가 붙었는데, 여기는 처음 본 금액 그대로 결제됐어요.</p></blockquote>
+          <footer>김○○ 님 · 도쿄 왕복</footer>
+        </figure>
+        <figure class="review" style="margin:0">
+          <div class="stars" aria-label="별점 5점"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3 6.5 7 .8-5.2 4.8 1.4 7-6.2-3.6L5.8 21l1.4-7L2 9.3l7-.8z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3 6.5 7 .8-5.2 4.8 1.4 7-6.2-3.6L5.8 21l1.4-7L2 9.3l7-.8z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3 6.5 7 .8-5.2 4.8 1.4 7-6.2-3.6L5.8 21l1.4-7L2 9.3l7-.8z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3 6.5 7 .8-5.2 4.8 1.4 7-6.2-3.6L5.8 21l1.4-7L2 9.3l7-.8z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3 6.5 7 .8-5.2 4.8 1.4 7-6.2-3.6L5.8 21l1.4-7L2 9.3l7-.8z"/></svg></div>
+          <blockquote style="margin:0"><p>가격 알림 덕분에 방콕 항공권을 9만 원 싸게 샀어요. 알림이 딱 필요한 순간에 와요.</p></blockquote>
+          <footer>이○○ 님 · 방콕 왕복</footer>
+        </figure>
+        <figure class="review" style="margin:0">
+          <div class="stars" aria-label="별점 4점"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3 6.5 7 .8-5.2 4.8 1.4 7-6.2-3.6L5.8 21l1.4-7L2 9.3l7-.8z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3 6.5 7 .8-5.2 4.8 1.4 7-6.2-3.6L5.8 21l1.4-7L2 9.3l7-.8z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3 6.5 7 .8-5.2 4.8 1.4 7-6.2-3.6L5.8 21l1.4-7L2 9.3l7-.8z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3 6.5 7 .8-5.2 4.8 1.4 7-6.2-3.6L5.8 21l1.4-7L2 9.3l7-.8z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" opacity=".25"><path d="m12 2 3 6.5 7 .8-5.2 4.8 1.4 7-6.2-3.6L5.8 21l1.4-7L2 9.3l7-.8z"/></svg></div>
+          <blockquote style="margin:0"><p>항공편이 결항됐을 때 상담사가 먼저 연락해서 대체편을 잡아 줬어요. 새벽이었는데도요.</p></blockquote>
+          <footer>박○○ 님 · 삿포로 왕복</footer>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 앱 -->
+  <section class="app-cta" aria-labelledby="app-title">
+    <div class="wrap">
+      <div class="app-card">
+        <svg class="arc" viewBox="0 0 420 240" fill="none" aria-hidden="true"><path d="M10 230C80 20 340 20 410 230" stroke="currentColor" stroke-width="18" stroke-linecap="round"/></svg>
+        <div style="position:relative">
+          <h2 id="app-title">앱에서 첫 예약 시 5,000원 할인</h2>
+          <p>탑승권 보관, 실시간 운항 정보, 가격 알림을 한곳에서 받아 보세요.</p>
+        </div>
+        <div class="btns">
+          <a href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.5 2-3.6-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9s-1.8-.8-3-.8C7 7.3 5.5 8.2 4.7 9.6c-1.7 2.9-.4 7.2 1.2 9.5.8 1.1 1.7 2.4 2.9 2.4 1.2 0 1.6-.8 3-.8s1.8.8 3 .7c1.3 0 2.1-1.1 2.8-2.3.9-1.3 1.3-2.6 1.3-2.7 0 0-2.5-1-2.5-3.8zM14.1 5.6c.6-.8 1.1-1.8 1-2.9-.9 0-2.1.6-2.7 1.4-.6.7-1.1 1.8-1 2.8 1 .1 2.1-.5 2.7-1.3z"/></svg>App Store</a>
+          <a href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 3.5v17c0 .4.4.6.7.4l9.6-8.5L4.7 3.1c-.3-.2-.7 0-.7.4zM15.6 13.6l2.6 2.3-10.9 6 8.3-8.3zM15.6 10.4 7.3 2.1l10.9 6-2.6 2.3zM19.4 9l-2.8 3 2.8 3 1.9-1.1c.9-.5.9-1.4 0-1.9z"/></svg>Google Play</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="logo" href="#" aria-label="구름다리 홈">
+          <svg class="logo-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <rect width="32" height="32" rx="9" fill="currentColor"/>
+            <path d="M6 21c3.2-7.4 16.8-7.4 20 0" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+            <circle cx="6" cy="21" r="2.2" fill="#fff"/><circle cx="26" cy="21" r="2.2" fill="#fff"/>
+            <path d="M11 11.5a3 3 0 0 1 5.6-1.2 2.4 2.4 0 0 1 3.4 2.2H11.4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          구름다리
+        </a>
+        <p>항공권 비교부터 발권, 여행 중 변경까지. 하늘길 위의 든든한 다리가 되어 드릴게요.</p>
+        <div class="cs">
+          <strong class="num">1588-0000</strong>
+          <span>연중무휴 24시간 상담</span>
+        </div>
+      </div>
+      <div>
+        <h4>예약</h4>
+        <ul><li><a href="#">항공권 검색</a></li><li><a href="#">항공+숙소</a></li><li><a href="#">단체 항공권</a></li><li><a href="#">예약 조회</a></li></ul>
+      </div>
+      <div>
+        <h4>고객지원</h4>
+        <ul><li><a href="#">자주 묻는 질문</a></li><li><a href="#">취소·환불 안내</a></li><li><a href="#">수하물 규정</a></li><li><a href="#">1:1 문의</a></li></ul>
+      </div>
+      <div>
+        <h4>회사</h4>
+        <ul><li><a href="#">회사 소개</a></li><li><a href="#">채용</a></li><li><a href="#">제휴 문의</a></li><li><a href="#">공지사항</a></li></ul>
+      </div>
+    </div>
+
+    <div class="legal">
+      <div class="legal-links"><a href="#">이용약관</a><a href="#">개인정보처리방침</a><a href="#">여행자 약관</a><a href="#">위치정보 이용약관</a></div>
+      <p>(주)구름다리 · 대표 홍길동 · 서울특별시 중구 세종대로 000, 12층 · 사업자등록번호 000-00-00000 · 통신판매업신고 제2026-서울중구-0000호 · 관광사업자 등록번호 제2026-000000호</p>
+      <p>구름다리는 통신판매중개자로서 항공권 거래의 당사자가 아니며, 항공 운송에 관한 의무와 책임은 각 항공사에 있습니다. 표시된 운임은 조회 시점 기준이며 좌석 상황에 따라 달라질 수 있습니다.</p>
+      <p class="num">© 2026 Gureumdari Inc.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const DOW = ['일', '월', '화', '수', '목', '금', '토'];
+  const fmt = (v) => { const d = new Date(v + 'T00:00:00'); return `${d.getMonth() + 1}월 ${d.getDate()}일 (${DOW[d.getDay()]})`; };
+
+  // 왕복/편도
+  const returnBtn = $('#return-btn');
+  $$('.trip-toggle button').forEach(b => b.addEventListener('click', () => {
+    $$('.trip-toggle button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    const oneway = b.dataset.trip === 'oneway';
+    returnBtn.classList.toggle('is-disabled', oneway);
+    $('#return-label').textContent = oneway ? '편도 여정' : fmt($('#return').value);
+  }));
+
+  // 출발/도착 바꾸기
+  $('#swap').addEventListener('click', (e) => {
+    const f = $('#from'), t = $('#to');
+    [f.value, t.value] = [t.value, f.value];
+    e.currentTarget.classList.toggle('spin');
+  });
+
+  // 날짜
+  const bindDate = (btnSel, inputSel, labelSel) => {
+    const btn = $(btnSel), input = $(inputSel), label = $(labelSel);
+    btn.addEventListener('click', () => {
+      if (btn.classList.contains('is-disabled')) { $$('.trip-toggle button')[0].click(); }
+      try { input.showPicker(); } catch { input.focus(); }
+    });
+    input.addEventListener('change', () => {
+      label.textContent = fmt(input.value);
+      if (inputSel === '#depart' && $('#return').value < input.value) {
+        $('#return').value = input.value;
+        if (!returnBtn.classList.contains('is-disabled')) $('#return-label').textContent = fmt(input.value);
+      }
+    });
+  };
+  bindDate('#depart-btn', '#depart', '#depart-label');
+  bindDate('#return-btn', '#return', '#return-label');
+
+  // 승객 팝오버
+  const pax = { adult: 1, child: 0, infant: 0 };
+  const popBtn = $('#pax-btn'), pop = $('#pax-pop');
+  const togglePop = (open) => { pop.hidden = !open; popBtn.setAttribute('aria-expanded', open); };
+  const renderPax = () => {
+    $$('.stepper').forEach(s => {
+      const k = s.dataset.key, [minus, plus] = $$('button', s);
+      $('output', s).textContent = pax[k];
+      minus.disabled = pax[k] <= (k === 'adult' ? 1 : 0);
+      plus.disabled = pax.adult + pax.child >= 9 && k !== 'infant' || (k === 'infant' && pax.infant >= pax.adult);
+    });
+    const cabin = $('input[name="cabin"]:checked').value;
+    const parts = [`성인 ${pax.adult}명`];
+    if (pax.child) parts.push(`소아 ${pax.child}명`);
+    if (pax.infant) parts.push(`유아 ${pax.infant}명`);
+    $('#pax-label').textContent = `${parts.join(', ')}, ${cabin}`;
+  };
+  $$('.stepper').forEach(s => {
+    const k = s.dataset.key, [minus, plus] = $$('button', s);
+    minus.addEventListener('click', () => { pax[k]--; if (pax.infant > pax.adult) pax.infant = pax.adult; renderPax(); });
+    plus.addEventListener('click', () => { pax[k]++; renderPax(); });
+  });
+  $$('input[name="cabin"]').forEach(r => r.addEventListener('change', renderPax));
+  popBtn.addEventListener('click', () => togglePop(pop.hidden));
+  $('#pax-done').addEventListener('click', () => { togglePop(false); popBtn.focus(); });
+  document.addEventListener('click', (e) => { if (!e.target.closest('.pax')) togglePop(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !pop.hidden) { togglePop(false); popBtn.focus(); } });
+  renderPax();
+
+  // 최근 검색
+  $$('.chip[data-to]').forEach(c => c.addEventListener('click', () => { $('#from').value = '서울 (ICN)'; $('#to').value = c.dataset.to; $('#to').focus(); }));
+
+  // 특가 필터 (표시용)
+  $$('.filters button').forEach(b => b.addEventListener('click', () => $$('.filters button').forEach(x => x.setAttribute('aria-pressed', x === b))));
+
+  // 최저가 막대
+  const fares = [98, 112, 86, 74, 79, 131, 142, 94, 69, 72, 88, 118, 126, 90];
+  const max = Math.max(...fares), min = Math.min(...fares);
+  const start = new Date('2026-10-13T00:00:00');
+  $('#bars').innerHTML = fares.map((p, i) => {
+    const d = new Date(start); d.setDate(d.getDate() + i);
+    const low = p <= min + 6;
+    const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    return `<button type="button" class="bar${low ? ' low' : ''}" data-date="${iso}" aria-label="${d.getMonth() + 1}월 ${d.getDate()}일 ${p}000원">
+      <span class="bar-price num">${p}천</span>
+      <span class="bar-fill" style="height:${Math.round(p / max * 100) - 30}%"></span>
+      <span class="bar-day num${d.getDay() === 0 ? ' sun' : ''}">${d.getDate()}일 ${DOW[d.getDay()]}</span>
+    </button>`;
+  }).join('');
+  $$('#bars .bar').forEach(b => b.addEventListener('click', () => {
+    $('#to').value = '오사카 (KIX)';
+    $('#depart').value = b.dataset.date;
+    $('#depart').dispatchEvent(new Event('change'));
+    $$('.trip-toggle button')[1].click();
+    $('#search').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }));
+
+  window.searchFlights = () => {
+    const to = $('#to');
+    if (!to.value.trim()) { to.focus(); to.placeholder = '도착지를 먼저 입력해 주세요'; return; }
+    const btn = $('.btn-search'); const old = btn.innerHTML;
+    btn.textContent = '검색 중…'; setTimeout(() => (btn.innerHTML = old), 1200);
+  };
+})();
+</script>
+</body>
+</html>
